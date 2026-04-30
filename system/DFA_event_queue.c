@@ -61,8 +61,7 @@ void DFA_Match_Byte(uint8_t ch)
         return;
     }
     // ============= 收集完前缀，开始收集参数（如果带参数）或加入队列（不带参数或参数值收集完成） =============
-    if(matched_cmd_idx < CMD_COUNT)//匹配到了第g_match_cmd_idx条命令
-    {
+    if(matched_cmd_idx < CMD_COUNT){//匹配到了第g_match_cmd_idx条命令
         //如果此条指令带参数，继续收集参数值
         if(ch >= '0' && ch <= '9'){
             matched_cmd_param_val = matched_cmd_param_val * 10 + (ch - '0');
@@ -76,35 +75,23 @@ void DFA_Match_Byte(uint8_t ch)
         matched_cmd_param_val = 0;//重置参数值
     }
     // ============= 正常匹配命令前缀 =============
-    for(uint8_t i = 0; i < CMD_COUNT; i++)  // 此字符匹配遍历所有命令
-    {
+    for(uint8_t i = 0; i < CMD_COUNT; i++){  // 此字符匹配遍历所有命令
         // DEBUG(ch);
-        if(ch == cmd_list[i].cmd[dfa_cmd_progress[i]])//匹配到第i条命令的当前字符
-        {
+        if(ch == cmd_list[i].cmd[dfa_cmd_progress[i]]){//匹配到第i条命令的当前字符
             dfa_cmd_progress[i]++;  //当前命令的匹配进度增加
             // ===================== 关键：前缀匹配完成 =====================
-            if(dfa_cmd_progress[i] >= strlen(cmd_list[i].cmd))//完全匹配到第i条命令
-            {
-                DEBUG(i+'0');
-                // DEBUG('\n');
+            if(dfa_cmd_progress[i] >= strlen(cmd_list[i].cmd)){//完全匹配到第i条命令
                 matched_cmd_idx = i;    //收集匹配到的指令的参数后加入队列，无参数直接加入队列
-                if(cmd_list[i].has_param)//带参数
-                {
-                    DEBUG(i+'5');
-                    // 进入参数收集模式
-                    matched_cmd_param_val = 0;
+                if(cmd_list[i].has_param){//带参数
+                    matched_cmd_param_val = 0;// 进入参数收集模式
                 }
-                else//不带参数，直接加入队列
-                {
-                    // 无参数，直接触发事件
+                else{//不带参数，直接加入队列
                     matched_cmd_param_val = -1; //无参指令参数为-1
-                    // ... 你可以自己加
                 }
                 dfa_cmd_progress[i] = 0;    //重置第i条命令的匹配进度，此条命令匹配完成
             }
         }
-        else//不匹配
-        {
+        else{//不匹配
             dfa_cmd_progress[i] = 0;    //重置第i条命令的匹配进度
         }
     }
