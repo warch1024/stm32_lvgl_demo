@@ -4,8 +4,13 @@
 #include "event_handlers.h"
 #include <string.h>
 #include "DX_BT24.h"
-#define CMD_COUNT (sizeof(cmd_list) / sizeof(struct DFA_Cmd_t))
 
+static trie_node_t *trie_root = NULL;//Trie树根节点，所有命令的前缀都从根节点开始匹配
+
+/*******************************************************************************
+ *********************** DFA事件解析框架*****************************************
+ *******************************************************************************
+ */
 static event_queue_t *event_queue = NULL;
 static event_queue_t *event_queue_tail = NULL;
 
@@ -23,7 +28,7 @@ static DFA_cmd_t cmd_list[] = {
 
 };
 
-void Match_Event_Handler(event_type_t evt, int param_val){
+static void Match_Event_Handler(event_type_t evt, int param_val){
 
     switch(evt){
         case EVT_DEFAULT:   Event_Push(default_handler, param_val, &event_queue, &event_queue_tail); break;
@@ -41,7 +46,7 @@ void Match_Event_Handler(event_type_t evt, int param_val){
 
 //==================== DFA 核心：逐字节解析 ====================
 //对每个队列的所有命令进行匹配
-void DFA_Match_Byte(uint8_t ch)
+static void DFA_Match_Byte(uint8_t ch)
 {
     static uint8_t first_byte_received_flag = 0;
     static uint8_t dfa_cmd_progress[CMD_COUNT] = {0};//每个队列的所有命令的当前匹配进度
@@ -96,9 +101,112 @@ void DFA_Match_Byte(uint8_t ch)
         }
     }
 }
+/*******************************************************************************
+ *********************** Trie事件解析框架****************************************
+ *******************************************************************************
+ */
+// 创建新节点
+static trie_node_t* trie_create_node(void) {
+    trie_node_t *node = (trie_node_t*)malloc(sizeof(trie_node_t));
+    if (node) {
+        memset(node->children, 0, sizeof(node->children));
+        node->event = EVT_DEFAULT;
+        node->has_param = 0;
+        node->is_end = 0;
+    }
+    return node;
+}
+
+// 插入命令到Trie树
+static void trie_insert(const char *cmd, event_type_t event, uint8_t has_param) {
+    trie_node_t *node = trie_root;
+    while (*cmd) {
+        uint8_t ch = (uint8_t)*cmd;
+        if (!node->children[ch]) {
+            node->children[ch] = trie_create_node();
+        }
+        node = node->children[ch];
+        cmd++;
+    }
+    node->event = event;// \0节点存储事件类型
+    node->has_param = has_param; // 是否带参数
+    node->is_end = 1;  // 标记命令结束节点
+}
+// 优化后的DFA匹配函数
+void Trie_Match_Byte(uint8_t ch) {
+    static trie_node_t *current_node = NULL;  // 当前匹配节点
+    static int matched_cmd_param_val = 0;
+    static event_type_t pending_event = EVT_DEFAULT;
+    
+    // 初始化
+    if (!current_node) {
+        current_node = trie_root;
+    }
+    
+    // 回车换行：重置状态
+    if (ch == '\n') {
+        current_node = trie_root;
+        matched_cmd_param_val = 0;
+        pending_event = EVT_DEFAULT;
+        return;
+    }
+    
+    // 参数收集阶段
+    if (pending_event != EVT_DEFAULT) {
+        if (ch >= '0' && ch <= '9') {
+            matched_cmd_param_val = matched_cmd_param_val * 10 + (ch - '0');
+            if (matched_cmd_param_val > 100) matched_cmd_param_val = 100;
+            return;
+        }
+        // 参数收集完成，入队
+        Match_Event_Handler(pending_event, matched_cmd_param_val);
+        pending_event = EVT_DEFAULT;
+        matched_cmd_param_val = 0;
+        current_node = trie_root;  // 重置状态机
+    }
+    
+    // 前缀匹配阶段
+    if (current_node->children[ch]) {
+        current_node = current_node->children[ch];
+        // 检查是否到达命令末尾
+        if (current_node->is_end) {
+            pending_event = current_node->event;
+            if (!current_node->has_param) {
+                // 不带参数，立即入队
+                Match_Event_Handler(pending_event, -1);
+                pending_event = EVT_DEFAULT;
+                current_node = trie_root;
+            }
+        }
+    } else {
+        // 匹配失败，重置
+        current_node = trie_root;
+    }
+}
+
+static void trie_init(void) {
+    trie_root = trie_create_node();
+    
+    // 插入所有命令
+    trie_insert("led-on-", EVT_LED_ON, 1);
+    trie_insert("led-off-", EVT_LED_OFF, 1);
+    trie_insert("beep-on-", EVT_BEEP_ON, 1);
+    trie_insert("beep-off-", EVT_BEEP_OFF, 1);
+    trie_insert("fan-on-", EVT_FAN_ON, 1);
+    trie_insert("fan-off-", EVT_FAN_OFF, 1);
+    trie_insert("fan-speed-", EVT_FAN_SPEED, 1);
+    trie_insert("co2-auto-", EVT_CO2_AUTO, 1);
+    trie_insert("co2-off-", EVT_CO2_OFF, 1);
+    // ... 更多命令
+}
+
+/*******************************************************************************
+ *************************** 事件队列框架 ***************************************
+ *******************************************************************************
+ */
 
 //将事件推送到事件队列
-void Event_Push(event_handler_t evt, int param_val, 
+static void Event_Push(event_handler_t evt, int param_val, 
     event_queue_t **event_queue, event_queue_t **event_queue_tail)
 {
     // 触发事件
@@ -125,7 +233,7 @@ void Event_Push(event_handler_t evt, int param_val,
     }
 }
 // 取出事件队列头事件并运行
-static int8_t Event_Pop(event_queue_t **event_queue, event_queue_t **event_queue_tail){
+static int8_t Event_Pop_run(event_queue_t **event_queue, event_queue_t **event_queue_tail){
     if(event_queue != NULL && *event_queue != NULL){
         event_queue_t *head = *event_queue;
         head->evt(head->param_val);//运行队头事件
@@ -140,5 +248,8 @@ static int8_t Event_Pop(event_queue_t **event_queue, event_queue_t **event_queue
 }
 
 int8_t run_event_task(void){
-    return Event_Pop(&event_queue, &event_queue_tail);
+    if(USE_TRIE){
+        trie_init();
+    }
+    return Event_Pop_run(&event_queue, &event_queue_tail);
 }
