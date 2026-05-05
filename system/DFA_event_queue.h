@@ -2,16 +2,6 @@
 #define __DFA_EVENT_QUEUE_H__
 #include "stm32f4xx.h"
 
-#define CMD_COUNT EVT_COUNT
-
-#if (CMD_COUNT >= 10)
-// 使用Trie树解析命令
-#define USE_TRIE 1
-#else
-// 使用原DFA线性遍历
-#define USE_TRIE 0
-#endif
-
 // 命令对应的所有事件定义
 typedef enum Event_Type_t{
     EVT_DEFAULT = 0,
@@ -26,6 +16,12 @@ typedef enum Event_Type_t{
     EVT_CO2_OFF,    //带参数
     EVT_COUNT, // 事件总类型数量
 } event_type_t;
+
+#define CMD_COUNT EVT_COUNT
+
+#if (CMD_COUNT >= 10)
+    #define USE_TRIE_OPTIMIZATION 1
+#endif
 
 typedef struct DFA_Cmd_t{
     const char *cmd;      // 命令前缀
@@ -51,7 +47,9 @@ typedef struct Trie_Node_t {
 
 
 void Trie_Match_Byte(uint8_t ch);
+void DFA_Match_Byte(uint8_t ch);
 int8_t run_event_task(void);
+void trie_init(void);
 
 #endif
 

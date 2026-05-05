@@ -17,6 +17,8 @@
 
 void init(void){
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    // 初始化Trie树
+    trie_init();
 	led_gpio_init();
 	key_gpio_init();
     key_interrupt_init();

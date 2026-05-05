@@ -7,10 +7,6 @@
 
 static trie_node_t *trie_root = NULL;//Trie树根节点，所有命令的前缀都从根节点开始匹配
 
-/*******************************************************************************
- *********************** DFA事件解析框架*****************************************
- *******************************************************************************
- */
 static event_queue_t *event_queue = NULL;
 static event_queue_t *event_queue_tail = NULL;
 
@@ -25,8 +21,18 @@ static DFA_cmd_t cmd_list[] = {
     {"fan-speed-", 1}, // 7
     {"co2-auto-", 1}, // 8
     {"co2-off-", 1}, // 9
-
+    
 };
+//静态函数声明：
+static void Event_Push(event_handler_t evt, int param_val, 
+    event_queue_t **event_queue, event_queue_t **event_queue_tail);
+
+
+
+/*******************************************************************************
+ *********************** DFA事件解析框架*****************************************
+ *******************************************************************************
+ */
 
 static void Match_Event_Handler(event_type_t evt, int param_val){
 
@@ -46,7 +52,7 @@ static void Match_Event_Handler(event_type_t evt, int param_val){
 
 //==================== DFA 核心：逐字节解析 ====================
 //对每个队列的所有命令进行匹配
-static void DFA_Match_Byte(uint8_t ch)
+void DFA_Match_Byte(uint8_t ch)
 {
     static uint8_t first_byte_received_flag = 0;
     static uint8_t dfa_cmd_progress[CMD_COUNT] = {0};//每个队列的所有命令的当前匹配进度
@@ -105,7 +111,9 @@ static void DFA_Match_Byte(uint8_t ch)
  *********************** Trie事件解析框架****************************************
  *******************************************************************************
  */
+#if defined(USE_TRIE_OPTIMIZATION)      //编译开关，是否使用Trie树解析命令
 // 创建新节点
+
 static trie_node_t* trie_create_node(void) {
     trie_node_t *node = (trie_node_t*)malloc(sizeof(trie_node_t));
     if (node) {
@@ -184,7 +192,11 @@ void Trie_Match_Byte(uint8_t ch) {
     }
 }
 
-static void trie_init(void) {
+#endif
+
+void trie_init(void) {
+#if defined(USE_TRIE_OPTIMIZATION)
+    // 初始化Trie树根节点
     trie_root = trie_create_node();
     
     // 插入所有命令
@@ -198,8 +210,8 @@ static void trie_init(void) {
     trie_insert("co2-auto-", EVT_CO2_AUTO, 1);
     trie_insert("co2-off-", EVT_CO2_OFF, 1);
     // ... 更多命令
+#endif
 }
-
 /*******************************************************************************
  *************************** 事件队列框架 ***************************************
  *******************************************************************************
@@ -248,8 +260,5 @@ static int8_t Event_Pop_run(event_queue_t **event_queue, event_queue_t **event_q
 }
 
 int8_t run_event_task(void){
-    if(USE_TRIE){
-        trie_init();
-    }
     return Event_Pop_run(&event_queue, &event_queue_tail);
 }

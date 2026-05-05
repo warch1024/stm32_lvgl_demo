@@ -79,7 +79,7 @@ void USART1_IRQHandler(void)    // 串口1的中断服务函数
     {
         // 处理接收中断
         uint8_t recv_byte = USART_ReceiveData(USART1); // 接收字节
-        if(USE_TRIE){
+        if (USE_TRIE_OPTIMIZATION){
             Trie_Match_Byte(recv_byte);
         }
         else{
