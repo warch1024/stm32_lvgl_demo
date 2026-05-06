@@ -22,3 +22,5 @@
 .\objects\event_handlers.o: .\hardware\motor.h
 .\objects\event_handlers.o: .\hardware\CO2_sensor.h
 .\objects\event_handlers.o: .\hardware\uart.h
+.\objects\event_handlers.o: D:\ProgramFiles\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\event_handlers.o: .\hardware\esp8266.h

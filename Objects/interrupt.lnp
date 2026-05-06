@@ -9,6 +9,7 @@
 ".\objects\uart.o"
 ".\objects\co2_sensor.o"
 ".\objects\dx_bt24.o"
+".\objects\esp8266.o"
 ".\objects\tools.o"
 ".\objects\systick.o"
 ".\objects\pwm.o"

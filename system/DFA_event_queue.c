@@ -21,21 +21,39 @@ static DFA_cmd_t cmd_list[] = {
     {"fan-speed-", 1}, // 7
     {"co2-auto-", 1}, // 8
     {"co2-off-", 1}, // 9
+    {"co2-get-value", 0}, // 10
     
 };
 //静态函数声明：
 static void Event_Push(event_handler_t evt, int param_val, 
     event_queue_t **event_queue, event_queue_t **event_queue_tail);
+static trie_node_t* trie_create_node(void);
+static void trie_insert(const char *cmd, event_type_t event, uint8_t has_param);
 
 
-
-/*******************************************************************************
- *********************** DFA事件解析框架*****************************************
- *******************************************************************************
- */
-
+void trie_init(void) {
+    ERR_MSG("trie_init\r\n");
+    if(USE_TRIE_OPTIMIZATION){
+        // 初始化Trie树根节点
+        trie_root = trie_create_node();
+        
+        //插入所有命令
+        trie_insert("led-on-", EVT_LED_ON, 1);
+        trie_insert("led-off-", EVT_LED_OFF, 1);
+        trie_insert("beep-on-", EVT_BEEP_ON, 1);
+        trie_insert("beep-off-", EVT_BEEP_OFF, 1);
+        trie_insert("fan-on-", EVT_FAN_ON, 1);
+        trie_insert("fan-off-", EVT_FAN_OFF, 1);
+        trie_insert("fan-speed-", EVT_FAN_SPEED, 1);
+        trie_insert("co2-auto-", EVT_CO2_AUTO, 1);
+        trie_insert("co2-off-", EVT_CO2_OFF, 1);
+        trie_insert("co2-get-value", EVT_CO2_GET_VALUE, 0);
+        trie_insert("esp8266-net-init", EVT_ESP8266_INIT, 0);
+        // ... 更多命令
+    }
+}
+        
 static void Match_Event_Handler(event_type_t evt, int param_val){
-
     switch(evt){
         case EVT_DEFAULT:   Event_Push(default_handler, param_val, &event_queue, &event_queue_tail); break;
         case EVT_LED_ON:    Event_Push(led_on, param_val, &event_queue, &event_queue_tail); break;
@@ -47,8 +65,15 @@ static void Match_Event_Handler(event_type_t evt, int param_val){
         case EVT_FAN_SPEED: Event_Push(fan_speed, param_val, &event_queue, &event_queue_tail); break;
         case EVT_CO2_AUTO:  Event_Push(co2_auto,param_val, &event_queue, &event_queue_tail); break;
         case EVT_CO2_OFF:   Event_Push(co2_off, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_CO2_GET_VALUE: Event_Push(co2_get_value, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_ESP8266_INIT: Event_Push(esp8266_net_init_task, param_val, &event_queue, &event_queue_tail); break;
+        default: break;
     }
 }
+/*******************************************************************************
+ *********************** DFA事件解析框架*****************************************
+ *******************************************************************************
+ */
 
 //==================== DFA 核心：逐字节解析 ====================
 //对每个队列的所有命令进行匹配
@@ -111,9 +136,16 @@ void DFA_Match_Byte(uint8_t ch)
  *********************** Trie事件解析框架****************************************
  *******************************************************************************
  */
-#if defined(USE_TRIE_OPTIMIZATION)      //编译开关，是否使用Trie树解析命令
+// #if defined(USE_TRIE_OPTIMIZATION) && (USE_TRIE_OPTIMIZATION)      //编译开关，是否使用Trie树解析命令
 // 创建新节点
-
+// 字符转索引
+static inline int char_to_index(uint8_t ch) {
+    if (ch < TRIE_CHAR_MIN || ch > TRIE_CHAR_MAX) {
+        return -1;  // 无效字符
+    }
+    return ch - TRIE_CHAR_MIN;
+}
+// 修改 trie_create_node
 static trie_node_t* trie_create_node(void) {
     trie_node_t *node = (trie_node_t*)malloc(sizeof(trie_node_t));
     if (node) {
@@ -125,33 +157,37 @@ static trie_node_t* trie_create_node(void) {
     return node;
 }
 
-// 插入命令到Trie树
+// 修改 trie_insert
 static void trie_insert(const char *cmd, event_type_t event, uint8_t has_param) {
     trie_node_t *node = trie_root;
     while (*cmd) {
-        uint8_t ch = (uint8_t)*cmd;
-        if (!node->children[ch]) {
-            node->children[ch] = trie_create_node();
+        int idx = char_to_index((uint8_t)*cmd);
+        if (idx < 0) {
+            // 无效字符，跳过
+            cmd++;
+            continue;
         }
-        node = node->children[ch];
+        if (!node->children[idx]) {
+            node->children[idx] = trie_create_node();
+        }
+        node = node->children[idx];
         cmd++;
     }
-    node->event = event;// \0节点存储事件类型
-    node->has_param = has_param; // 是否带参数
-    node->is_end = 1;  // 标记命令结束节点
+    node->event = event;
+    node->has_param = has_param;
+    node->is_end = 1;
 }
-// 优化后的DFA匹配函数
+
+// 修改 Trie_Match_Byte
 void Trie_Match_Byte(uint8_t ch) {
-    static trie_node_t *current_node = NULL;  // 当前匹配节点
+    static trie_node_t *current_node = NULL;
     static int matched_cmd_param_val = 0;
     static event_type_t pending_event = EVT_DEFAULT;
     
-    // 初始化
     if (!current_node) {
         current_node = trie_root;
     }
     
-    // 回车换行：重置状态
     if (ch == '\n') {
         current_node = trie_root;
         matched_cmd_param_val = 0;
@@ -159,59 +195,38 @@ void Trie_Match_Byte(uint8_t ch) {
         return;
     }
     
-    // 参数收集阶段
     if (pending_event != EVT_DEFAULT) {
         if (ch >= '0' && ch <= '9') {
             matched_cmd_param_val = matched_cmd_param_val * 10 + (ch - '0');
             if (matched_cmd_param_val > 100) matched_cmd_param_val = 100;
             return;
         }
-        // 参数收集完成，入队
         Match_Event_Handler(pending_event, matched_cmd_param_val);
         pending_event = EVT_DEFAULT;
         matched_cmd_param_val = 0;
-        current_node = trie_root;  // 重置状态机
+        current_node = trie_root;
     }
     
-    // 前缀匹配阶段
-    if (current_node->children[ch]) {
-        current_node = current_node->children[ch];
-        // 检查是否到达命令末尾
+    // 使用偏移索引
+    int idx = char_to_index(ch);
+    if (idx >= 0 && current_node->children[idx]) {
+        current_node = current_node->children[idx];
         if (current_node->is_end) {
             pending_event = current_node->event;
             if (!current_node->has_param) {
-                // 不带参数，立即入队
                 Match_Event_Handler(pending_event, -1);
                 pending_event = EVT_DEFAULT;
                 current_node = trie_root;
             }
         }
     } else {
-        // 匹配失败，重置
         current_node = trie_root;
     }
 }
 
-#endif
+// #endif
 
-void trie_init(void) {
-#if defined(USE_TRIE_OPTIMIZATION)
-    // 初始化Trie树根节点
-    trie_root = trie_create_node();
-    
-    // 插入所有命令
-    trie_insert("led-on-", EVT_LED_ON, 1);
-    trie_insert("led-off-", EVT_LED_OFF, 1);
-    trie_insert("beep-on-", EVT_BEEP_ON, 1);
-    trie_insert("beep-off-", EVT_BEEP_OFF, 1);
-    trie_insert("fan-on-", EVT_FAN_ON, 1);
-    trie_insert("fan-off-", EVT_FAN_OFF, 1);
-    trie_insert("fan-speed-", EVT_FAN_SPEED, 1);
-    trie_insert("co2-auto-", EVT_CO2_AUTO, 1);
-    trie_insert("co2-off-", EVT_CO2_OFF, 1);
-    // ... 更多命令
-#endif
-}
+
 /*******************************************************************************
  *************************** 事件队列框架 ***************************************
  *******************************************************************************

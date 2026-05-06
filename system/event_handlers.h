@@ -11,6 +11,8 @@ void fan_off(int param_val);
 void fan_speed(int param_val);
 void co2_auto(int param_val);
 void co2_off(int param_val);
+void co2_get_value(int param_val);
+void esp8266_net_init_task(int param_val);
 
 
 

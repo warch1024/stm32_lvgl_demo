@@ -14,6 +14,8 @@ typedef enum Event_Type_t{
     EVT_FAN_SPEED,   // 带参数
     EVT_CO2_AUTO, //带参数
     EVT_CO2_OFF,    //带参数
+    EVT_CO2_GET_VALUE,   // 无参数
+    EVT_ESP8266_INIT,   // 无参数
     EVT_COUNT, // 事件总类型数量
 } event_type_t;
 
@@ -22,7 +24,7 @@ typedef enum Event_Type_t{
 #if (CMD_COUNT >= 10)
     #define USE_TRIE_OPTIMIZATION 1
 #endif
-
+#define USE_TRIE_OPTIMIZATION 1
 typedef struct DFA_Cmd_t{
     const char *cmd;      // 命令前缀
     uint8_t has_param;    // 1=带参数 0=不带参数
@@ -37,14 +39,16 @@ typedef struct Event_Queue_t{
     struct Event_Queue_t *next;
 }event_queue_t;
 // Trie树节点结构体
+// 优化后：95个指针（126 - 32 + 1 = 95）
+#define TRIE_CHAR_MIN 32  // 空格
+#define TRIE_CHAR_MAX 126 // ~
+#define TRIE_CHAR_RANGE (TRIE_CHAR_MAX - TRIE_CHAR_MIN + 1)  // 95
 typedef struct Trie_Node_t {
-    struct Trie_Node_t *children[256];  // 256个ASCII字符
+    struct Trie_Node_t *children[TRIE_CHAR_RANGE];  // 95个可见ASCII字符
     event_type_t event;              // 匹配成功时的事件类型
     uint8_t has_param;               // 是否带参数
     uint8_t is_end;                  // 是否为命令结束节点
 } trie_node_t;
-
-
 
 void Trie_Match_Byte(uint8_t ch);
 void DFA_Match_Byte(uint8_t ch);

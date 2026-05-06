@@ -20,3 +20,4 @@
 .\objects\dx_bt24.o: hardware\uart.h
 .\objects\dx_bt24.o: D:\ProgramFiles\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 .\objects\dx_bt24.o: .\system\DFA_event_queue.h
+.\objects\dx_bt24.o: hardware\USART_config.h

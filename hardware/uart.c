@@ -9,6 +9,7 @@
 #include "stm32f4xx.h"
 #include "DFA_event_queue.h"
 #include "DX_BT24.h"
+#include "esp8266.h"
 char uart1_cmd_cache[MAX_CMD_LEN];
 uint8_t uart1_cmd_cache_idx = 0;
 
@@ -79,12 +80,12 @@ void USART1_IRQHandler(void)    // 串口1的中断服务函数
     {
         // 处理接收中断
         uint8_t recv_byte = USART_ReceiveData(USART1); // 接收字节
-        if (USE_TRIE_OPTIMIZATION){
+        if(USE_TRIE_OPTIMIZATION){
             Trie_Match_Byte(recv_byte);
-        }
-        else{
+        }else{
             DFA_Match_Byte(recv_byte);// 收到字节后，将字节添加到事件队列中        
         }
+        send_byte_to_esp8266(recv_byte);
         USART_ClearITPendingBit(USART1, USART_IT_RXNE);  // 清除接收中断标志位
     }
 }

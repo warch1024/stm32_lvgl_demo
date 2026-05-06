@@ -26,3 +26,4 @@
 .\objects\uart.o: hardware\CO2_sensor.h
 .\objects\uart.o: .\system\DFA_event_queue.h
 .\objects\uart.o: hardware\DX_BT24.h
+.\objects\uart.o: hardware\esp8266.h

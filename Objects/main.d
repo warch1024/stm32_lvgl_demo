@@ -31,3 +31,5 @@
 .\objects\main.o: .\hardware\CO2_sensor.h
 .\objects\main.o: .\hardware\DX_BT24.h
 .\objects\main.o: .\system\DFA_event_queue.h
+.\objects\main.o: .\hardware\esp8266.h
+.\objects\main.o: .\hardware\USART_config.h

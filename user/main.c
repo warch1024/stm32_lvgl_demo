@@ -13,12 +13,13 @@
 #include "CO2_sensor.h"
 #include "DX_BT24.h"
 #include "DFA_event_queue.h"
+#include "esp8266.h"
+#include "USART_config.h"
 
 
 void init(void){
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     // 初始化Trie树
-    trie_init();
 	led_gpio_init();
 	key_gpio_init();
     key_interrupt_init();
@@ -29,9 +30,15 @@ void init(void){
     // timer14_pwm_init();// led1pwm
     // timer1_pwm_init();//led4pwm
     motor1_speed_regulation_init();
-    usart_init(9600);
+    usart_init(115200);
     CO2_sensor_init(9600);
-    dx_bt24_init(9600);
+    if(USART3_TO_MODULE == DX_BT24){
+        dx_bt24_init(9600);
+    }
+    else if(USART3_TO_MODULE == ESP8266){
+        esp8266_init(115200);
+    }
+    trie_init();
 }
 
 

@@ -4,6 +4,9 @@
 #include "motor.h"
 #include "CO2_sensor.h"
 #include "uart.h"
+#include "stdio.h"
+#include "esp8266.h"
+
 void default_handler(int param_val){
     // ... 你可以自己加
     ERR_MSG("Default Handler\r\n");
@@ -79,4 +82,19 @@ void co2_off(int param_val){
     ERR_MSG("CO2 Sensor Off Control\r\n");
 }
 
-
+void co2_get_value(int param_val){
+    // ... 你可以自己加
+    if(CO2_sensor_control_mode == CO2_SENSOR_AUTO_CONTROL){
+        usart1_send_string("CO2 Value: ");
+        printf("%d", CO2_density);
+        usart1_send_string("\r\n");
+    }
+    else{
+        usart1_send_string("CO2 sensor is off");
+        usart1_send_string("\r\n");
+    }
+}
+void esp8266_net_init_task(int param_val){
+    // ... 你可以自己加
+    esp8266_net_init();
+}
