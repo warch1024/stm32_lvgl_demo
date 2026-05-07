@@ -33,3 +33,6 @@
 .\objects\main.o: .\system\DFA_event_queue.h
 .\objects\main.o: .\hardware\esp8266.h
 .\objects\main.o: .\hardware\USART_config.h
+.\objects\main.o: .\tools\esp8266_mqtt.h
+.\objects\main.o: .\hardware\RS485.h
+.\objects\main.o: .\hardware\ultra_sound.h

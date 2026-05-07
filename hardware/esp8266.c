@@ -4,110 +4,301 @@
 #include <string.h>
 #include "DFA_event_queue.h"
 #include "tools.h"
+#include "systick.h"
+
+uint8_t  g_esp8266_tx_buf[512];
+volatile uint8_t  g_esp8266_rx_buf[512];
+volatile uint32_t g_esp8266_rx_cnt=0;
+volatile uint32_t g_esp8266_rx_end=0;
+
+volatile uint32_t g_esp8266_transparent_transmission_sta=0;
+
 
 static char uart3_cmd_cache[MAX_CMD_LEN];
 static uint8_t uart3_cmd_cache_idx = 0;
 
-void esp8266_init(uint32_t baudrate)
+void esp8266_usart_init(uint32_t baudrate)
 {
-    // 初始化使能USART3 pa10 pa11
-    // 使能USART3时钟
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-    // 使能GPIOA时钟
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-    // 初始化使能GPIOA
-    GPIO_InitTypeDef GPIO_InitStruct;
-    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-    GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
-    GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    // 配置GPIOA9为USART1的AF引脚
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_USART3);
-    // 配置GPIOA10为USART1的AF引脚
-    GPIO_PinAFConfig(GPIOB, GPIO_PinSource11, GPIO_AF_USART3);
-    // 初始化使能USART3
-    USART_InitTypeDef USART_InitStruct;
-    USART_InitStruct.USART_BaudRate = baudrate;
-    USART_InitStruct.USART_WordLength = USART_WordLength_8b;
-    USART_InitStruct.USART_Parity = USART_Parity_No;
-    USART_InitStruct.USART_StopBits = USART_StopBits_1;
-    USART_InitStruct.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
-    USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_Init(USART3, &USART_InitStruct);// 使能USART3
-
-    //接收中断配置
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = USART3_IRQn;
-    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStruct);
-    // 使能接收中断
-    USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-
-    // 使能USART3
-    USART_Cmd(USART3, ENABLE);
+	usart3_init(baudrate);
 }
+
 #include "USART_config.h"
-#if defined(USART3_TO_MODULE) && (USART3_TO_MODULE == ESP8266)
+#if defined(USART3_TO_MODULE) && (USART3_TO_MODULE == USART3_ESP8266)
 // 连接ESP8266模块
 void USART3_IRQHandler(void)    // 串口3的中断服务函数
 {
+    uint8_t d=0;
     if(USART_GetITStatus(USART3, USART_IT_RXNE) == SET)   //判断是否是接收中断发生
     {
         // 处理接收中断
-        uint16_t recv_byte = USART_ReceiveData(USART3); // 接收字节
-        usart1_send_byte(recv_byte);
+        d = USART_ReceiveData(USART3); // 接收字节
+        g_esp8266_rx_buf[g_esp8266_rx_cnt++] = d;
+
+        if (g_esp8266_transparent_transmission_sta && d == '}') {
+          g_esp8266_rx_end = 1;
+        }
+
+        if (g_esp8266_rx_cnt >= sizeof(g_esp8266_rx_buf)) {
+          g_esp8266_rx_end = 1;
+        }
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);  // 清除接收中断标志位
     }
 }
 #endif
 
-
-int8_t send_byte_to_esp8266(uint8_t byte)
+void esp8266_send_AT(char *str)
 {
-    while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);    // 等待发送完成
-    USART_SendData(USART3, byte); // 发送字节
-    return 1;
+	//清空接收缓冲区
+	memset((void *)g_esp8266_rx_buf,0, sizeof g_esp8266_rx_buf);
+	
+	//清空接收计数值
+	g_esp8266_rx_cnt = 0;	
+	
+	//串口3发送数据
+	usart3_send_str(str);
 }
 
-int8_t send_string_to_esp8266(char* str)
+void esp8266_send_bytes(uint8_t *buf,uint32_t len)
 {
-    while(*str != '\0'){
-        send_byte_to_esp8266(*str++);
-    }
-    return 1;
+	usart3_send_bytes(buf,len);
+
+}
+
+void esp8266_send_str(char *buf)
+{
+	usart3_send_str(buf);
+
+}
+
+/* 查找接收数据包中的字符串 */
+int32_t esp8266_find_str_in_rx_packet(char *str,uint32_t timeout){
+	char *dest = str;
+	char *src  = (char *)&g_esp8266_rx_buf;
+	//等待串口接收完毕或超时退出
+	while((strstr(src,dest)==NULL) && timeout)
+	{		
+		delay_ms(1);
+		timeout--;
+	}
+
+	if(timeout) return 0; 
+	return -1; 
+}
+
+/* 自检程序 */
+int32_t  esp8266_self_test(void)
+{
+	esp8266_send_AT("AT\r\n");
+	
+	return esp8266_find_str_in_rx_packet("OK",1000);
+}
+
+/**
+ * 功能：连接热点
+ * 参数：
+ *         ssid:热点名
+ *         pwd:热点密码
+ * 返回值：
+ *         连接结果,非0连接成功,0连接失败
+ * 说明： 
+ *         失败的原因有以下几种(UART通信和ESP8266正常情况下)
+ *         1. WIFI名和密码不正确
+ *         2. 路由器连接设备太多,未能给ESP8266分配IP
+ */
+int32_t esp8266_connect_ap(char* ssid,char* pswd)
+{
+#if 0
+	//不建议使用以下sprintf，占用过多的栈
+	char buf[128]={0};
+	
+	sprintf(buf,"AT+CWJAP_CUR=\"%s\",\"%s\"\r\n",ssid,pswd);
+
+#endif
+    //设置为STATION模式	
+	esp8266_send_AT("AT+CWMODE_CUR=1\r\n"); 
+	
+	if(esp8266_find_str_in_rx_packet("OK",1000)) return -1;
+	//连接目标AP
+	//sprintf(buf,"AT+CWJAP_CUR=\"%s\",\"%s\"\r\n",ssid,pswd);
+	esp8266_send_AT("AT+CWJAP_CUR="); 
+	esp8266_send_AT("\"");esp8266_send_AT(ssid);esp8266_send_AT("\"");	
+	esp8266_send_AT(",");	
+	esp8266_send_AT("\"");esp8266_send_AT(pswd);esp8266_send_AT("\"");	
+	esp8266_send_AT("\r\n");
+	if(esp8266_find_str_in_rx_packet("OK",5000))
+		if(esp8266_find_str_in_rx_packet("CONNECT",5000))
+			return -2;
+
+	return 0;
+}
+
+/* 退出透传模式 */
+int32_t esp8266_exit_transparent_transmission (void)
+{
+
+	esp8266_send_AT ("+++");
+	
+	//退出透传模式，发送下一条AT指令要间隔1秒
+	delay_ms ( 1000 ); 
+	
+	//记录当前esp8266工作在非透传模式
+	g_esp8266_transparent_transmission_sta = 0;
+
+	return 0;
+}
+
+/* 进入透传模式 */
+int32_t  esp8266_entry_transparent_transmission(void)
+{
+	//进入透传模式
+	esp8266_send_AT("AT+CIPMODE=1\r\n");  
+	if(esp8266_find_str_in_rx_packet("OK",5000))
+		return -1;
+	
+	delay_ms(2000);
+	//开启发送状态
+	esp8266_send_AT("AT+CIPSEND\r\n");
+	if(esp8266_find_str_in_rx_packet(">",5000))
+		return -2;
+
+	//记录当前esp8266工作在透传模式
+	g_esp8266_transparent_transmission_sta = 1;
+	return 0;
 }
 
 
-void esp8266_net_init(void)
+/**
+ * 功能：使用指定协议(TCP/UDP)连接到服务器
+ * 参数：
+ *         mode:协议类型 "TCP","UDP"
+ *         ip:目标服务器IP
+ *         port:目标是服务器端口号
+ * 返回值：
+ *         连接结果,非0连接成功,0连接失败
+ * 说明： 
+ *         失败的原因有以下几种(UART通信和ESP8266正常情况下)
+ *         1. 远程服务器IP和端口号有误
+ *         2. 未连接AP
+ *         3. 服务器端禁止添加(一般不会发生)
+ */
+int32_t esp8266_connect_server(char* mode,char* ip,uint16_t port)
 {
-	delay(2000);
-    send_string_to_esp8266( "+++");
-	delay(2000);
-	send_string_to_esp8266("AT+RST\r\n");
-	delay(3000);
+
+#if 0	
+	//使用MQTT传递的ip地址过长，不建议使用以下方法，否则导致栈溢出
+	//AT+CIPSTART="TCP","a10tC4OAAPc.iot-as-mqtt.cn-shanghai.aliyuncs.com",1883，该字符串占用内存过多了
 	
-	//设置工作模式为STA
-	send_string_to_esp8266("AT+CWMODE=3\r\n");
-	delay(3000);
+	char buf[128]={0};
 	
-	// //连接WiFi
-	// send_string_to_esp8266("AT+CWJAP=\"microsoftWindowsPhone\",\"15550073646\"\r\n");
-	// delay(10000);
+	//连接服务器
+	sprintf((char*)buf,"AT+CIPSTART=\"%s\",\"%s\",%d\r\n",mode,ip,port);
 	
-	//连接TCP服务器 10.249.157.105
-	// send_string_to_esp8266("AT+CIPSTART=\"TCP\",\"10.6.26.179\",8888\r\n");
-	// delay(5000);
+	esp8266_send_AT(buf);
+#else
 	
-	//设置IP模式为数据
-	send_string_to_esp8266("AT+CIPMODE=1\r\n");
-	delay(3000);
+	char buf[16]={0};
+	esp8266_send_AT("AT+CIPSTART=");
+	esp8266_send_AT("\"");	esp8266_send_AT(mode);	esp8266_send_AT("\"");
+	esp8266_send_AT(",");
+	esp8266_send_AT("\"");	esp8266_send_AT(ip);	esp8266_send_AT("\"");	
+	esp8266_send_AT(",");
+	sprintf(buf,"%d",port);
+	esp8266_send_AT(buf);	
+	esp8266_send_AT("\r\n");
 	
-	//发送数据
-	send_string_to_esp8266("AT+CIPSEND\r\n");
-	delay(3000);
+#endif
+	
+	if(esp8266_find_str_in_rx_packet("CONNECT",5000))
+		if(esp8266_find_str_in_rx_packet("OK",5000))
+			return -1;
+	return 0;
 }
+
+/* 断开服务器 */
+int32_t esp8266_disconnect_server(void)
+{
+	esp8266_send_AT("AT+CIPCLOSE\r\n");
+		
+	if(esp8266_find_str_in_rx_packet("CLOSED",5000))
+		if(esp8266_find_str_in_rx_packet("OK",5000))
+			return -1;
+	
+	return 0;	
+}
+
+
+/* 使能多链接 */
+int32_t esp8266_enable_multiple_id(uint32_t b)
+{
+
+	char buf[32]={0};
+	
+	sprintf(buf,"AT+CIPMUX=%d\r\n", b);
+	esp8266_send_AT(buf);
+	
+	if(esp8266_find_str_in_rx_packet("OK",5000))
+		return -1;
+	
+	return 0;
+}
+
+/* 创建服务器 */
+int32_t esp8266_create_server(uint16_t port)
+{
+	char buf[32]={0};
+	
+	sprintf(buf,"AT+CIPSERVER=1,%d\r\n", port);
+	esp8266_send_AT(buf);
+	
+	if(esp8266_find_str_in_rx_packet("OK",5000))
+		return -1;
+	
+	return 0;
+}
+
+/* 关闭服务器 */
+int32_t esp8266_close_server(uint16_t port)
+{
+	char buf[32]={0};
+	
+	sprintf(buf,"AT+CIPSERVER=0,%d\r\n", port);
+	esp8266_send_AT(buf);
+	
+	if(esp8266_find_str_in_rx_packet("OK",5000))
+		return -1;
+	
+	return 0;
+}
+
+/* 回显打开或关闭 */
+int32_t esp8266_enable_echo(uint32_t b)
+{
+	if(b)
+		esp8266_send_AT("ATE1\r\n"); 
+	else
+		esp8266_send_AT("ATE0\r\n"); 
+	
+	if(esp8266_find_str_in_rx_packet("OK",5000))
+		return -1;
+
+	return 0;
+}
+
+/* 复位 */
+int32_t esp8266_reset(void)
+{
+	esp8266_send_AT("AT+RST\r\n");
+	
+	if(esp8266_find_str_in_rx_packet("OK",10000))
+		return -1;
+
+	return 0;
+}
+
+
+
+
+
+
+
+

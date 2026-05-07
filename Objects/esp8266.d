@@ -21,4 +21,5 @@
 .\objects\esp8266.o: D:\ProgramFiles\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 .\objects\esp8266.o: .\system\DFA_event_queue.h
 .\objects\esp8266.o: .\tools\tools.h
+.\objects\esp8266.o: .\system\systick.h
 .\objects\esp8266.o: hardware\USART_config.h

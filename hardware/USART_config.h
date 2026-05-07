@@ -1,10 +1,13 @@
 #ifndef __USART_CONFIG_H__
 #define __USART_CONFIG_H__
 
-#define DX_BT24 0
-#define ESP8266 1
+#define USART3_DX_BT24 0
+#define USART3_ESP8266 1
+#define USART2_CO2_SENSOR 2
+#define USART2_RS485 3
 
-#define USART3_TO_MODULE ESP8266  //0连接
+#define USART2_TO_MODULE  USART2_RS485  //0连接
+#define USART3_TO_MODULE  USART3_ESP8266  //0连接
 
 #endif
 

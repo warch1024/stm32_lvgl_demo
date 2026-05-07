@@ -20,3 +20,4 @@
 .\objects\co2_sensor.o: hardware\uart.h
 .\objects\co2_sensor.o: D:\ProgramFiles\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\co2_sensor.o: hardware\motor.h
+.\objects\co2_sensor.o: hardware\USART_config.h

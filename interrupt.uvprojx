@@ -518,6 +518,26 @@
               <FileType>5</FileType>
               <FilePath>.\hardware\esp8266.h</FilePath>
             </File>
+            <File>
+              <FileName>RS485.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hardware\RS485.c</FilePath>
+            </File>
+            <File>
+              <FileName>RS485.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\hardware\RS485.h</FilePath>
+            </File>
+            <File>
+              <FileName>ultra_sound.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hardware\ultra_sound.c</FilePath>
+            </File>
+            <File>
+              <FileName>ultra_sound.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\hardware\ultra_sound.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -532,6 +552,16 @@
               <FileName>tools.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\tools\tools.h</FilePath>
+            </File>
+            <File>
+              <FileName>esp8266_mqtt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\tools\esp8266_mqtt.c</FilePath>
+            </File>
+            <File>
+              <FileName>esp8266_mqtt.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tools\esp8266_mqtt.h</FilePath>
             </File>
           </Files>
         </Group>

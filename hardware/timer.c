@@ -4,6 +4,9 @@
 #include "tools.h"
 #include "beep.h"
 #include "mq_2.h"
+#include "esp8266_mqtt.h"
+
+
 
 void timer_init(void)
 {
@@ -18,7 +21,7 @@ void timer_init(void)
     timer_init_struct.TIM_Prescaler = 16800 -1;//168M / 16800 = 10KHz
     timer_init_struct.TIM_ClockDivision = TIM_CKD_DIV1;
     timer_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
-    timer_init_struct.TIM_Period = 1000 - 1;// （1/10K）* 1K = 1/10s
+    timer_init_struct.TIM_Period = 10000 - 1;// （1/10K）* 10K = 1s
     TIM_TimeBaseInit(TIM1, &timer_init_struct);
     // 初始化定时器2
     timer_init_struct.TIM_Prescaler = 8400 -1;//84MHz / 8400 = 10KHz
@@ -66,15 +69,15 @@ void timer_init(void)
     NVIC_Init(&nvic_init_struct);
     // 初始化中断方式
     TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);  // 使能更新中断
-    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);  // 使能更新中断
-    TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);  // 使能更新中断
-    TIM_ITConfig(TIM8, TIM_IT_Update, ENABLE);  // 使能更新中断
+    // TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);  // 使能更新中断
+    // TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);  // 使能更新中断
+    // TIM_ITConfig(TIM8, TIM_IT_Update, ENABLE);  // 使能更新中断
     
     // 开启定时器1,2,3,8
     TIM_Cmd(TIM1, ENABLE);  // 使能定时器1
-    TIM_Cmd(TIM2, ENABLE);  // 使能定时器2
-    TIM_Cmd(TIM3, ENABLE);  // 使能定时器3
-    TIM_Cmd(TIM8, ENABLE);  // 使能定时器8
+    // TIM_Cmd(TIM2, ENABLE);  // 使能定时器2
+    // TIM_Cmd(TIM3, ENABLE);  // 使能定时器3
+    // TIM_Cmd(TIM8, ENABLE);  // 使能定时器8
 }
 
 
@@ -84,13 +87,9 @@ void TIM1_UP_TIM10_IRQHandler(void)
     // 处理定时器1更新中断
     if(TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET)
     {
-        // 处理更新中断
-        if(LED1_state = ~LED1_state){
-            LED1_OFF;
-        }
-        else{
-            LED1_ON;
-        }
+
+        // 发送心跳包
+        //  mqtt_heart_and_report();
     }
     TIM_ClearITPendingBit(TIM1, TIM_IT_Update);  // 清除更新中断标志位
 }

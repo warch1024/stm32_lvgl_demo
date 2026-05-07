@@ -55,7 +55,7 @@ void dx_bt24_init(uint32_t baudrate)
 }
 
 #include "USART_config.h"
-#if defined(USART3_TO_MODULE) && (USART3_TO_MODULE == DX_BT24)
+#if defined(USART3_TO_MODULE) && (USART3_TO_MODULE == USART3_DX_BT24)
 // 连接蓝牙模块
 void USART3_IRQHandler(void)    // 串口3的中断服务函数
 {
@@ -69,9 +69,7 @@ void USART3_IRQHandler(void)    // 串口3的中断服务函数
     }
 }
 #endif
-int8_t usart3_send_byte(uint8_t byte)
-{
-    while(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET);    // 等待发送完成
-    USART_SendData(USART3, byte); // 发送字节
-    return 1;
-}
+
+
+
+

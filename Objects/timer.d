@@ -21,3 +21,4 @@
 .\objects\timer.o: .\tools\tools.h
 .\objects\timer.o: hardware\beep.h
 .\objects\timer.o: hardware\mq_2.h
+.\objects\timer.o: .\tools\esp8266_mqtt.h

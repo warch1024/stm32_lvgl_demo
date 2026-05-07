@@ -22,31 +22,76 @@ Dialog DLL:      TCM.DLL V1.14.4.0
  
 <h2>Project:</h2>
 e:\yueqian_projects\STM32-projects\interrupt\interrupt.uvprojx
-Project File Date:  05/06/2026
+Project File Date:  05/07/2026
 
 <h2>Output:</h2>
-Build target 'interrupt'
+Rebuild target 'interrupt'
 compiling main.c...
+user\main.c(74): warning:  #223-D: function "memset" declared implicitly
+          memset((void *)g_esp8266_rx_buf,0,sizeof g_esp8266_rx_buf);
+user\main.c(98): warning:  #1293-D: assignment in condition
+              if(LED2_state = ~LED2_state){
+user\main.c: 2 warnings, 0 errors
+compiling key_interrupt.c...
+compiling led.c...
+compiling mq_2.c...
+compiling timer.c...
+hardware\timer.c(103): warning:  #1293-D: assignment in condition
+          if(LED2_state = ~LED2_state){
+hardware\timer.c(119): warning:  #1293-D: assignment in condition
+          if(LED3_state = ~LED3_state){
+hardware\timer.c: 2 warnings, 0 errors
+compiling beep.c...
+compiling motor.c...
 compiling uart.c...
-compiling DX_BT24.c...
-hardware\DX_BT24.c(77): warning:  #1-D: last line of file ends without a newline
+compiling CO2_sensor.c...
+hardware\CO2_sensor.c(61): warning:  #1-D: last line of file ends without a newline
   }
-hardware\DX_BT24.c: 1 warning, 0 errors
+hardware\CO2_sensor.c(7): warning:  #177-D: variable "CO2_sensor_cache" was declared but never referenced
+  static char CO2_sensor_cache[6];
+hardware\CO2_sensor.c(8): warning:  #177-D: variable "CO2_sensor_index" was declared but never referenced
+  static int CO2_sensor_index = 0;
+hardware\CO2_sensor.c: 3 warnings, 0 errors
+compiling DX_BT24.c...
 compiling esp8266.c...
-hardware\esp8266.c(8): warning:  #177-D: variable "uart3_cmd_cache" was declared but never referenced
+hardware\esp8266.c(205): warning:  #223-D: function "sprintf" declared implicitly
+        sprintf(buf,"%d",port);
+hardware\esp8266.c(236): warning:  #223-D: function "sprintf" declared implicitly
+        sprintf(buf,"AT+CIPMUX=%d\r\n", b);
+hardware\esp8266.c(250): warning:  #223-D: function "sprintf" declared implicitly
+        sprintf(buf,"AT+CIPSERVER=1,%d\r\n", port);
+hardware\esp8266.c(264): warning:  #223-D: function "sprintf" declared implicitly
+        sprintf(buf,"AT+CIPSERVER=0,%d\r\n", port);
+hardware\esp8266.c(17): warning:  #177-D: variable "uart3_cmd_cache" was declared but never referenced
   static char uart3_cmd_cache[MAX_CMD_LEN];
-hardware\esp8266.c(9): warning:  #177-D: variable "uart3_cmd_cache_idx" was declared but never referenced
+hardware\esp8266.c(18): warning:  #177-D: variable "uart3_cmd_cache_idx" was declared but never referenced
   static uint8_t uart3_cmd_cache_idx = 0;
-hardware\esp8266.c: 2 warnings, 0 errors
+hardware\esp8266.c: 6 warnings, 0 errors
+compiling RS485.c...
+compiling ultra_sound.c...
+compiling tools.c...
+compiling esp8266_mqtt.c...
+tools\esp8266_mqtt.c(402): warning:  #1293-D: assignment in condition
+      if(LED4_state = ~LED4_state){
+tools\esp8266_mqtt.c: 1 warning, 0 errors
+compiling systick.c...
+compiling pwm.c...
+compiling retarget.c...
 compiling DFA_event_queue.c...
 compiling event_handlers.c...
-system\event_handlers.c(100): warning:  #1-D: last line of file ends without a newline
-  }
-system\event_handlers.c: 1 warning, 0 errors
+compiling misc.c...
+compiling stm32f4xx_exti.c...
+compiling stm32f4xx_gpio.c...
+compiling stm32f4xx_rcc.c...
+compiling stm32f4xx_syscfg.c...
+compiling stm32f4xx_tim.c...
+compiling stm32f4xx_usart.c...
+assembling startup_stm32f40_41xxx.s...
+compiling system_stm32f4xx.c...
 linking...
-Program Size: Code=9944 RO-data=548 RW-data=172 ZI-data=66660  
+Program Size: Code=8404 RO-data=548 RW-data=188 ZI-data=67780  
 FromELF: creating hex file...
-".\Objects\interrupt.axf" - 0 Error(s), 4 Warning(s).
+".\Objects\interrupt.axf" - 0 Error(s), 14 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -64,10 +109,10 @@ Package Vendor: Keil
    * Component: EXTI Version: 1.3.0
    * Component: Framework Version: 1.3.1
    * Component: SYSCFG Version: 1.3.0
-   * Component: TIM Version: 1.3.0
    * Component: RCC Version: 1.3.0
-   * Component: GPIO Version: 1.3.0
+   * Component: TIM Version: 1.3.0
    * Component: USART Version: 1.3.0
+   * Component: GPIO Version: 1.3.0
 
 <h2>Collection of Component include folders:</h2>
   e:\yueqian_projects\STM32-projects\interrupt\RTE
@@ -82,42 +127,42 @@ Package Vendor: Keil
       Source file:   CMSIS\UserCodeTemplates\ARM\ITM_Retarget.c
 
    * Component: Keil::Device:Startup:1.3.1
-      Source file:   Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
       Source file:   Device\Source\ARM\STM32F4xx_OTP.s
-      Source file:   Device\Source\ARM\startup_stm32f40_41xxx.s
-      Include file:  Device\Include\stm32f4xx.h
-      Include file:  RTE_Driver\Config\RTE_Device.h
+      Source file:   Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
       Source file:   Device\Source\system_stm32f4xx.c
+      Include file:  Device\Include\stm32f4xx.h
+      Source file:   Device\Source\ARM\startup_stm32f40_41xxx.s
+      Include file:  RTE_Driver\Config\RTE_Device.h
 
    * Component: Keil::Device:StdPeriph Drivers:EXTI:1.3.0
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_exti.h
       Source file:   Device\StdPeriph_Driver\src\stm32f4xx_exti.c
 
    * Component: Keil::Device:StdPeriph Drivers:Framework:1.3.1
-      Source file:   Device\StdPeriph_Driver\templates\stm32f4xx_conf.h
-      Source file:   Device\StdPeriph_Driver\src\misc.c
       Include file:  Device\StdPeriph_Driver\templates\stm32f4xx_it.h
       Source file:   Device\StdPeriph_Driver\templates\stm32f4xx_it.c
+      Source file:   Device\StdPeriph_Driver\src\misc.c
+      Source file:   Device\StdPeriph_Driver\templates\stm32f4xx_conf.h
 
    * Component: Keil::Device:StdPeriph Drivers:SYSCFG:1.3.0
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_syscfg.c
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_syscfg.h
-
-   * Component: Keil::Device:StdPeriph Drivers:TIM:1.3.0
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_tim.c
-      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_tim.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_syscfg.c
 
    * Component: Keil::Device:StdPeriph Drivers:RCC:1.3.0
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_rcc.h
       Source file:   Device\StdPeriph_Driver\src\stm32f4xx_rcc.c
 
-   * Component: Keil::Device:StdPeriph Drivers:GPIO:1.3.0
-      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_gpio.h
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_gpio.c
+   * Component: Keil::Device:StdPeriph Drivers:TIM:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_tim.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_tim.h
 
    * Component: Keil::Device:StdPeriph Drivers:USART:1.3.0
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_usart.h
       Source file:   Device\StdPeriph_Driver\src\stm32f4xx_usart.c
+
+   * Component: Keil::Device:StdPeriph Drivers:GPIO:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_gpio.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_gpio.h
 </pre>
 </body>
 </html>

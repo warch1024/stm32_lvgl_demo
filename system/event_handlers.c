@@ -90,11 +90,16 @@ void co2_get_value(int param_val){
         usart1_send_string("\r\n");
     }
     else{
-        usart1_send_string("CO2 sensor is off");
+        usart1_send_string("CO2 sensor was off");
         usart1_send_string("\r\n");
     }
 }
 void esp8266_net_init_task(int param_val){
     // ... 你可以自己加
-    esp8266_net_init();
+
 }
+
+
+
+
+
