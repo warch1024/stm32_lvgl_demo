@@ -35,6 +35,8 @@ extern int32_t esp8266_mqtt_init(void);
 
 extern void mqtt_report_devices_status(void);
 void mqtt_heart_and_report(void);
+
+void tackle_mqtt_topic_msg_and_hearting(void);
 #endif
 
 

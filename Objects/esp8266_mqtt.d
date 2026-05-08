@@ -24,3 +24,4 @@
 .\objects\esp8266_mqtt.o: .\hardware\uart.h
 .\objects\esp8266_mqtt.o: .\hardware\esp8266.h
 .\objects\esp8266_mqtt.o: .\hardware\led.h
+.\objects\esp8266_mqtt.o: .\system\DFA_event_queue.h

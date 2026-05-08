@@ -18,11 +18,13 @@
 #include "esp8266_mqtt.h"
 #include "RS485.h"
 #include "ultra_sound.h"
+#include "radar.h"
+#include "temperature_humidity_sensor.h"
 
 void init(void){
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     // 初始化Trie树
-	led_gpio_init();
+	// led_gpio_init();
 	key_gpio_init();
     key_interrupt_init();
     // mq2_gpio_init();
@@ -53,46 +55,25 @@ void init(void){
 	// }
     // printf("MQTT connect to broker success\r\n");
     ultra_sound_init();
-
-
-
+    temperature_humidity_sensor_init();
+    // radar_init();
+    // beep_pwm_init();
     trie_init();
 }
-void check_mqtt_topic_msg(void){
-    uint32_t delay_1ms_cnt=0;
-    //检查接收到数据
-    if(g_esp8266_rx_end && g_esp8266_transparent_transmission_sta){
-        for(int32_t i=0;i<g_esp8266_rx_cnt;i++){
-            if(USE_TRIE_OPTIMIZATION){
-                Trie_Match_Byte(g_esp8266_rx_buf[i]);
-            }
-            else{
-                DFA_Match_Byte(g_esp8266_rx_buf[i]);// 收到字节后，将字节添加到事件队列中        
-            }
-        }
-        //清空接收缓冲区、接收计数值、接收结束标志位
-        memset((void *)g_esp8266_rx_buf,0,sizeof g_esp8266_rx_buf);
-        g_esp8266_rx_cnt=0;
-        g_esp8266_rx_end=0;
-    }
-    delay_1ms_cnt++;
-    delay_ms(1);
-    //1秒时间到达
-    if(delay_1ms_cnt >= 1000){
-        delay_1ms_cnt=0;
-        mqtt_heart_and_report();
-    }
-}
+
 
 int main(){
     init();
     char str[] = "Hello World!\n";
-    // check_mqtt_topic_msg();  // 检查MQTT主题消息
+    // tackle_mqtt_topic_msg_and_hearting();  // 检查MQTT主题消息并处理心跳包
     while(1){
+        radar_distance_show();
+        // radar_distance_beeping();
         if(KEY1_State == 1){
             while(usart1_send_byte('X') != 1);
             while(usart1_send_string(str) != 1);
             printf("KEY1 Pressed\n");
+            clear_key_state();//清除按键状态
         }
         if(KEY2_State == 1){
             if(LED2_state = ~LED2_state){
@@ -101,19 +82,24 @@ int main(){
             else{
                 LED2_ON;
             }
+            clear_key_state();//清除按键状态
         }
         if(KEY3_State == 1){
-            int32_t distance = ultra_sound_measure();
-            if(distance >= 0){
-                printf("distance = %d mm\r\n", distance);
+            
+            clear_key_state();//清除按键状态
+        }
+        if(KEY4_State == 1){
+            int8_t ret = temperature_humidity_sensor_check();
+            if(ret == 0){
+                printf("temperature_humidity_sensor_check success\n");
             }
             else{
-                printf("ultra_sound_measure fail\r\n");
+                printf("temperature_humidity_sensor_check failed\n");
             }
+            clear_key_state();//清除按键状态
         }
         //根据CO2浓度设置通风速度比例
         run_event_task();//运行事件队列中的事件
-        clear_key_state();//清除按键状态
     }
 }
 

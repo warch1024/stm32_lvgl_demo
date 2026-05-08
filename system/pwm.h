@@ -17,5 +17,8 @@ void APB1_timer_pwm_init(uint32_t RCC_APB1Periph_TIMx, TIM_TypeDef *TIMx, uint16
 void APB2_timer_pwm_init(uint32_t RCC_APB2Periph_TIMx, TIM_TypeDef *TIMx, uint16_t TIM_OCMode_x,
     uint16_t TIM_OCPolarity_x, uint32_t TIM_Pulse_cnt, uint32_t TIM_Period, uint8_t OCx);
 
+void APB1_timer_pwm_set_period(TIM_TypeDef *TIMx, uint32_t TIM_Periodus);
+
+
 #endif
 

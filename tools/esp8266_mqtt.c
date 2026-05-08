@@ -7,6 +7,7 @@
 #include "uart.h"
 #include "esp8266.h"
 #include "led.h"
+#include "DFA_event_queue.h"
 
 //连接成功服务器回应 20 02 00 00
 //客户端主动断开连接 e0 00
@@ -406,5 +407,35 @@ void mqtt_heart_and_report(void){
         LED4_ON;
     }
 }
+
+
+void tackle_mqtt_topic_msg_and_hearting(void){
+    uint32_t delay_1ms_cnt=0;
+    //检查接收到数据
+    if(g_esp8266_rx_end && g_esp8266_transparent_transmission_sta){
+        for(int32_t i=0;i<g_esp8266_rx_cnt;i++){
+            if(USE_TRIE_OPTIMIZATION){
+                Trie_Match_Byte(g_esp8266_rx_buf[i]);
+            }
+            else{
+                DFA_Match_Byte(g_esp8266_rx_buf[i]);// 收到字节后，将字节添加到事件队列中        
+            }
+        }
+        //清空接收缓冲区、接收计数值、接收结束标志位
+        memset((void *)g_esp8266_rx_buf,0,sizeof g_esp8266_rx_buf);
+        g_esp8266_rx_cnt=0;
+        g_esp8266_rx_end=0;
+    }
+    delay_1ms_cnt++;
+    delay_ms(1);
+    //1秒时间到达
+    if(delay_1ms_cnt >= 1000){
+        delay_1ms_cnt=0;
+        mqtt_heart_and_report();
+    }
+}
+
+
+
 
 

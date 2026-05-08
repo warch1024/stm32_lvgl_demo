@@ -51,7 +51,7 @@ void APB1_timer_pwm_init(uint32_t RCC_APB1Periph_TIMx, TIM_TypeDef *TIMx, uint16
     
     // 配置定时器x
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
-    TIM_TimeBaseInitStruct.TIM_Prescaler = 84 - 1;
+    TIM_TimeBaseInitStruct.TIM_Prescaler = 84 - 1;  // 84MHz/84=1MHz 1us
     TIM_TimeBaseInitStruct.TIM_Period = TIM_Period - 1;   // 周期为TIM_Periodus
     TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
     TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
@@ -159,6 +159,21 @@ void APB2_timer_pwm_init(uint32_t RCC_APB2Periph_TIMx, TIM_TypeDef *TIMx, uint16
     TIM_Cmd(TIMx, ENABLE);
 
 }
+
+void APB1_timer_pwm_set_period(TIM_TypeDef *TIMx, uint32_t TIM_Periodus)  // 设置定时器x周期为TIM_Periodus x 0.1ms，10000=1s
+{
+    TIM_Cmd(TIMx, DISABLE);
+    // 配置定时器x
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
+    TIM_TimeBaseInitStruct.TIM_Prescaler = 8400 - 1;  // 84MHz/8400 = 10000Hz 0.1ms
+    TIM_TimeBaseInitStruct.TIM_Period = TIM_Periodus - 1;   // 周期为TIM_Period个0.1ms
+    TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseInit(TIMx, &TIM_TimeBaseInitStruct);
+    TIM_Cmd(TIMx, ENABLE);
+}
+
+
 
 
 

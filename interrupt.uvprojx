@@ -538,6 +538,16 @@
               <FileType>5</FileType>
               <FilePath>.\hardware\ultra_sound.h</FilePath>
             </File>
+            <File>
+              <FileName>temperature_humidity_sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hardware\temperature_humidity_sensor.c</FilePath>
+            </File>
+            <File>
+              <FileName>temperature_humidity_sensor.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\hardware\temperature_humidity_sensor.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -562,6 +572,16 @@
               <FileName>esp8266_mqtt.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\tools\esp8266_mqtt.h</FilePath>
+            </File>
+            <File>
+              <FileName>radar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\tools\radar.c</FilePath>
+            </File>
+            <File>
+              <FileName>radar.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tools\radar.h</FilePath>
             </File>
           </Files>
         </Group>
