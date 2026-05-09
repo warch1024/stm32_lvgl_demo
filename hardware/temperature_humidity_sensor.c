@@ -1,6 +1,8 @@
 #include "temperature_humidity_sensor.h"
 #include "systick.h"
 #include "stdio.h"
+temperature_humidity_sensor_data current_TH_data;
+
 void temperature_humidity_sensor_init(void){
     // 初始化温度湿度传感器
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
@@ -15,8 +17,6 @@ void temperature_humidity_set_IO_mode(GPIOMode_TypeDef mode){
         GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_Init(TEMPERATURE_HUMIDITY_SENSOR_GPIO, &GPIO_InitStructure);
 }
-
-
 
 inline int8_t temperature_humidity_sensor_check(void){
     // 设置温度湿度传感器io模式
@@ -63,7 +63,39 @@ inline int8_t temperature_humidity_sensor_check(void){
 
 
 int32_t temperature_humidity_sensor_measure(void){
-    // 测量温度湿度传感器
+    // 测量温度湿度传感器数据
+    uint32_t timeout = 0, high_timeout = 0;
+    uint8_t data[5] = {0};//    传来的数据从高到低，共40位数据5字节
+    int8_t ret = temperature_humidity_sensor_check();    //复用通信头
+    if(ret != 0){
+        return ret;
+    }
+    //现在已经被拉低，时间50us左右。50us低+26-28us高 = bit0；50us低+70us高 = bit1，共40位数据5字节
+
+    for(int i = 0; i < 40; i++, timeout = 0, high_timeout = 0){
+        //读取拉低时间
+        while(!TEMPERATURE_HUMIDITY_SENSOR_GPIO_IN_STATUS && timeout < 100000){
+        timeout ++;
+        delay_us(1);
+        }
+        if(timeout > 100000){// 超时
+            // printf("temperature_humidity_sensor_check_response_high timeout:%d us\r\n", timeout);
+            return -2;
+        }
+        //读取拉高时间，如果35us后还是高电平说明是bit1，否则是bit0
+        while(TEMPERATURE_HUMIDITY_SENSOR_GPIO_IN_STATUS && high_timeout < 100000){
+            high_timeout ++;
+            delay_us(1);
+        }
+        if(high_timeout > 30){   //此时为bit1
+            *(data + i/8) |= (1 << (7 - i % 8));
+        }
+        //此时被拉低
+    }
+    //读取完成
+    current_TH_data.temperature = data[2];
+    current_TH_data.humidity = data[0];
+    current_TH_data.checksum = data[4];
     return 0;
 }
 

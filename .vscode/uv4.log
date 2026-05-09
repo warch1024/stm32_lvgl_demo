@@ -21,11 +21,11 @@ Target info:
 ------------
 Device: STM32F407ZE
 VTarget = 3.300V
-State of Pins: TCK: 0, TDI: 0, TDO: 1, TMS: 0, TRES: 1, TRST: 1
+State of Pins: TCK: 0, TDI: 0, TDO: 1, TMS: 0, TRES: 1, TRST: 0
 Hardware-Breakpoints: 6
 Software-Breakpoints: 8192
 Watchpoints:          4
 JTAG speed: 4000 kHz
  
 Erase Done.Programming Done.Verify OK.Application running ...
-Flash Load finished at 09:31:50
+Flash Load finished at 09:17:12

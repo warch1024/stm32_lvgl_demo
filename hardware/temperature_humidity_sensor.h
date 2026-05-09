@@ -1,5 +1,14 @@
 #ifndef __TEMPERATURE_HUMIDITY_SENSOR_H__
 #define __TEMPERATURE_HUMIDITY_SENSOR_H__
+#include "stm32f4xx.h"
+
+typedef struct Temperature_Humidity_Sensor_Data{
+    uint8_t temperature;
+    uint8_t humidity;
+    uint8_t checksum;
+}temperature_humidity_sensor_data;
+
+extern temperature_humidity_sensor_data current_TH_data;
 
 #include "stm32f4xx.h"
 #define TEMPERATURE_HUMIDITY_SENSOR_GPIO   GPIOG
@@ -20,7 +29,7 @@ void temperature_humidity_sensor_init(void);
 int32_t temperature_humidity_sensor_measure(void);
 void temperature_humidity_set_IO_mode(GPIOMode_TypeDef mode);
 int8_t temperature_humidity_sensor_check(void);
-
+int32_t temperature_humidity_sensor_measure(void);
 
 
 #endif

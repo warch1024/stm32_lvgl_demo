@@ -36,7 +36,6 @@ void trie_init(void) {
     if(USE_TRIE_OPTIMIZATION){
         // 初始化Trie树根节点
         trie_root = trie_create_node();
-        
         //插入所有命令
         trie_insert("led-on-", EVT_LED_ON, 1);
         trie_insert("led-off-", EVT_LED_OFF, 1);
@@ -49,6 +48,19 @@ void trie_init(void) {
         trie_insert("co2-off-", EVT_CO2_OFF, 1);
         trie_insert("co2-get-value", EVT_CO2_GET_VALUE, 0);
         trie_insert("esp8266-net-init", EVT_ESP8266_INIT, 0);
+        trie_insert("submit-time-h-", EVT_SUBMIT_TIME_HOUR, 1);
+        trie_insert("submit-time-m-", EVT_SUBMIT_TIME_MIN, 1);
+        trie_insert("submit-time-s-", EVT_SUBMIT_TIME_SEC, 1);
+        trie_insert("submit-date-y-", EVT_SUBMIT_DATE_YEAR, 1);
+        trie_insert("submit-date-m-", EVT_SUBMIT_DATE_MONTH, 1);
+        trie_insert("submit-date-d-", EVT_SUBMIT_DATE_DAY, 1);
+        trie_insert("submit-date-w-", EVT_SUBMIT_DATE_WEEK, 1);
+        trie_insert("set-time", EVT_SET_TIME, 0);
+        trie_insert("set-date", EVT_SET_DATE, 0);
+        trie_insert("submit-alarm-h-", EVT_SUBMIT_ALARM_HOUR, 1);
+        trie_insert("submit-alarm-m-", EVT_SUBMIT_ALARM_MIN, 1);
+        trie_insert("submit-alarm-s-", EVT_SUBMIT_ALARM_SEC, 1);
+        trie_insert("set-alarm", EVT_SET_ALARM, 0);
         // ... 更多命令
     }
 }
@@ -67,6 +79,19 @@ static void Match_Event_Handler(event_type_t evt, int param_val){
         case EVT_CO2_OFF:   Event_Push(co2_off, param_val, &event_queue, &event_queue_tail); break;
         case EVT_CO2_GET_VALUE: Event_Push(co2_get_value, param_val, &event_queue, &event_queue_tail); break;
         case EVT_ESP8266_INIT: Event_Push(esp8266_net_init_task, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_TIME_HOUR: Event_Push(submit_time_hour, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_TIME_MIN: Event_Push(submit_time_min, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_TIME_SEC: Event_Push(submit_time_sec, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_DATE_YEAR: Event_Push(submit_date_year, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_DATE_MONTH: Event_Push(submit_date_month, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_DATE_DAY: Event_Push(submit_date_day, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_DATE_WEEK: Event_Push(submit_date_week, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SET_TIME: Event_Push(set_time, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SET_DATE: Event_Push(set_date, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_ALARM_HOUR: Event_Push(submit_alarm_hour, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_ALARM_MIN: Event_Push(submit_alarm_min, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SUBMIT_ALARM_SEC: Event_Push(submit_alarm_sec, param_val, &event_queue, &event_queue_tail); break;
+        case EVT_SET_ALARM: Event_Push(set_alarm, param_val, &event_queue, &event_queue_tail); break;
         default: break;
     }
 }
@@ -102,7 +127,7 @@ void DFA_Match_Byte(uint8_t ch)
         if(ch >= '0' && ch <= '9'){
             matched_cmd_param_val = matched_cmd_param_val * 10 + (ch - '0');
             // 可选：限制范围 0~100
-            if(matched_cmd_param_val > 100) matched_cmd_param_val = 100;
+            // if(matched_cmd_param_val > 100) matched_cmd_param_val = 100;
             return;//收集此条命令的全部参数
         }
         //如果此条指令不带参数，或者参数值收集完成，直接加入队列
@@ -278,6 +303,8 @@ int8_t run_event_task(void){
     return Event_Pop_run(&event_queue, &event_queue_tail);
 }
 
-
+void event_push_interface(event_handler_t evt, int param_val){
+    Event_Push(evt, param_val, &event_queue, &event_queue_tail);
+}
 
 

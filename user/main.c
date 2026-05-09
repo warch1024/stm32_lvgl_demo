@@ -20,11 +20,15 @@
 #include "ultra_sound.h"
 #include "radar.h"
 #include "temperature_humidity_sensor.h"
+#include "IWDG.h"
+#include "RTC.h"
+
+
 
 void init(void){
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     // 初始化Trie树
-	// led_gpio_init();
+	led_gpio_init();
 	key_gpio_init();
     key_interrupt_init();
     // mq2_gpio_init();
@@ -54,10 +58,14 @@ void init(void){
 	// 	delay_ms(500);
 	// }
     // printf("MQTT connect to broker success\r\n");
-    ultra_sound_init();
+    // ultra_sound_init();
     temperature_humidity_sensor_init();
     // radar_init();
     // beep_pwm_init();
+    // IWDG_Init(125);//初始化独立看门狗,超时时间为1秒
+    rtc_init();//初始化RTC
+    rtc_alarm_init();
+
     trie_init();
 }
 
@@ -67,7 +75,7 @@ int main(){
     char str[] = "Hello World!\n";
     // tackle_mqtt_topic_msg_and_hearting();  // 检查MQTT主题消息并处理心跳包
     while(1){
-        radar_distance_show();
+        // radar_distance_show();
         // radar_distance_beeping();
         if(KEY1_State == 1){
             while(usart1_send_byte('X') != 1);
@@ -82,10 +90,19 @@ int main(){
             else{
                 LED2_ON;
             }
+            // IWDG_CheckResetFlag();//检查独立看门狗是否复位了CPU
+            rtc_print_current_date_time();//打印当前日期和时间
             clear_key_state();//清除按键状态
         }
         if(KEY3_State == 1){
-            
+            int32_t ret = temperature_humidity_sensor_measure();
+            if(ret == 0){
+                printf("temperature_humidity_sensor_measure success, temperature:%d, humidity:%d, checksum:%d\n",
+                     current_TH_data.temperature, current_TH_data.humidity, current_TH_data.checksum);
+            }
+            else{
+                printf("temperature_humidity_sensor_measure failed, ret:%d\n", ret);
+            }
             clear_key_state();//清除按键状态
         }
         if(KEY4_State == 1){
@@ -96,10 +113,12 @@ int main(){
             else{
                 printf("temperature_humidity_sensor_check failed\n");
             }
+
             clear_key_state();//清除按键状态
         }
         //根据CO2浓度设置通风速度比例
         run_event_task();//运行事件队列中的事件
+        // IWDG_Reload();//喂狗
     }
 }
 

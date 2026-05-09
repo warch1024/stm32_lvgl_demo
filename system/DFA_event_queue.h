@@ -16,6 +16,19 @@ typedef enum Event_Type_t{
     EVT_CO2_OFF,    //带参数
     EVT_CO2_GET_VALUE,   // 无参数
     EVT_ESP8266_INIT,   // 无参数
+    EVT_SUBMIT_TIME_HOUR, //带参数
+    EVT_SUBMIT_TIME_MIN, //带参数
+    EVT_SUBMIT_TIME_SEC, //带参数
+    EVT_SUBMIT_DATE_YEAR, //带参数
+    EVT_SUBMIT_DATE_MONTH, //带参数
+    EVT_SUBMIT_DATE_DAY, //带参数
+    EVT_SUBMIT_DATE_WEEK, //带参数
+    EVT_SET_TIME, //不带参数
+    EVT_SET_DATE, //不带参数
+    EVT_SUBMIT_ALARM_HOUR, //带参数
+    EVT_SUBMIT_ALARM_MIN, //带参数
+    EVT_SUBMIT_ALARM_SEC, //带参数
+    EVT_SET_ALARM, //不带参数
     EVT_COUNT, // 事件总类型数量
 } event_type_t;
 
@@ -54,6 +67,9 @@ void Trie_Match_Byte(uint8_t ch);
 void DFA_Match_Byte(uint8_t ch);
 int8_t run_event_task(void);
 void trie_init(void);
+void event_push_interface(event_handler_t evt, int param_val);//将事件推送到事件队列接口
+
+
 
 #endif
 
