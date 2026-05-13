@@ -10,7 +10,9 @@
 .\objects\main.o: .\RTE\RTE_Components.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_exti.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include\stm32f4xx.h
+.\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_flash.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_gpio.h
+.\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_i2c.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_iwdg.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_pwr.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_rcc.h
@@ -43,3 +45,6 @@
 .\objects\main.o: .\hardware\temperature_humidity_sensor.h
 .\objects\main.o: .\system\IWDG.h
 .\objects\main.o: .\system\RTC.h
+.\objects\main.o: .\hardware\Flash.h
+.\objects\main.o: .\hardware\eeprom.h
+.\objects\main.o: .\hardware\oled_iic.h

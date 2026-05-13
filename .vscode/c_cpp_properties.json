@@ -21,14 +21,14 @@
         {
             "name": "interrupt",
             "includePath": [
-                "e:\\yueqian_projects\\STM32-projects\\interrupt\\RTE",
-                "e:\\yueqian_projects\\STM32-projects\\interrupt\\RTE\\Device\\STM32F407ZE",
-                "e:\\yueqian_projects\\STM32-projects\\interrupt\\hardware",
-                "e:\\yueqian_projects\\STM32-projects\\interrupt\\tools",
-                "e:\\yueqian_projects\\STM32-projects\\interrupt\\system",
+                "e:\\yueqian_projects\\STM32-projects\\interrupt_no_bootloader\\RTE",
+                "e:\\yueqian_projects\\STM32-projects\\interrupt_no_bootloader\\RTE\\Device\\STM32F407ZE",
+                "e:\\yueqian_projects\\STM32-projects\\interrupt_no_bootloader\\hardware",
+                "e:\\yueqian_projects\\STM32-projects\\interrupt_no_bootloader\\tools",
+                "e:\\yueqian_projects\\STM32-projects\\interrupt_no_bootloader\\system",
                 "D:\\ProgramFiles\\Keil_v5\\ARM\\ARMCC\\include",
                 "D:\\ProgramFiles\\Keil_v5\\ARM\\ARMCC\\include\\rw",
-                "e:\\yueqian_projects\\STM32-projects\\interrupt\\user",
+                "e:\\yueqian_projects\\STM32-projects\\interrupt_no_bootloader\\user",
                 "${default}"
             ],
             "defines": [

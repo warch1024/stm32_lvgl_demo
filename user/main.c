@@ -22,6 +22,9 @@
 #include "temperature_humidity_sensor.h"
 #include "IWDG.h"
 #include "RTC.h"
+#include "Flash.h"
+#include "eeprom.h"
+#include "oled_iic.h"
 
 
 
@@ -64,13 +67,18 @@ void init(void){
     // beep_pwm_init();
     // IWDG_Init(125);//初始化独立看门狗,超时时间为1秒
     rtc_init();//初始化RTC
-    rtc_alarm_init();
-
+    // rtc_alarm_init();
+    // Flash_Init();
+    eeprom_init();
+    // I2C_Configuration();
+	// OLED_Init();
     trie_init();
 }
 
 
 int main(){
+    // SCB->VTOR = 0x8020000;//设置VTOR为Flash的基地址
+
     init();
     char str[] = "Hello World!\n";
     // tackle_mqtt_topic_msg_and_hearting();  // 检查MQTT主题消息并处理心跳包
@@ -78,9 +86,11 @@ int main(){
         // radar_distance_show();
         // radar_distance_beeping();
         if(KEY1_State == 1){
+            // oled_demo();
             while(usart1_send_byte('X') != 1);
             while(usart1_send_string(str) != 1);
-            printf("KEY1 Pressed\n");
+            printf("KEY1 Pressed\r\n");
+            eeprom_test();
             clear_key_state();//清除按键状态
         }
         if(KEY2_State == 1){
