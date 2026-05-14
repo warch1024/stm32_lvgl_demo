@@ -613,6 +613,26 @@
               <FileType>5</FileType>
               <FilePath>.\hardware\spi_flash.h</FilePath>
             </File>
+            <File>
+              <FileName>RC522.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hardware\RC522.c</FilePath>
+            </File>
+            <File>
+              <FileName>RC522.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\hardware\RC522.h</FilePath>
+            </File>
+            <File>
+              <FileName>SPI_LCD.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hardware\SPI_LCD.c</FilePath>
+            </File>
+            <File>
+              <FileName>SPI_LCD.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\hardware\SPI_LCD.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -647,6 +667,16 @@
               <FileName>radar.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\tools\radar.h</FilePath>
+            </File>
+            <File>
+              <FileName>rc522_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\tools\rc522_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>rc522_app.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\tools\rc522_app.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -17,6 +17,7 @@
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_pwr.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_rcc.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_rtc.h
+.\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_spi.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_syscfg.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_tim.h
 .\objects\main.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_usart.h
@@ -48,3 +49,7 @@
 .\objects\main.o: .\hardware\Flash.h
 .\objects\main.o: .\hardware\eeprom.h
 .\objects\main.o: .\hardware\oled_iic.h
+.\objects\main.o: .\hardware\spi_flash.h
+.\objects\main.o: .\hardware\SPI.h
+.\objects\main.o: .\hardware\RC522.h
+.\objects\main.o: .\tools\rc522_app.h
