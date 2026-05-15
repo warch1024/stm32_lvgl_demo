@@ -22,41 +22,23 @@ Dialog DLL:      TCM.DLL V1.14.4.0
  
 <h2>Project:</h2>
 e:\yueqian_projects\STM32-projects\interrupt_no_bootloader\interrupt.uvprojx
-Project File Date:  05/13/2026
+Project File Date:  05/14/2026
 
 <h2>Output:</h2>
 Build target 'interrupt'
-compiling rc522_app.c...
-tools\rc522_app.h(6): warning:  #1-D: last line of file ends without a newline
-  #endif
-tools\rc522_app.c(82): warning:  #870-D: invalid multibyte character sequence
-      printf("卡片注册成功! 序列�? %02X %02X %02X %02X\r\n", 
-tools\rc522_app.c(191): warning:  #870-D: invalid multibyte character sequence
-          printf("没有检测到卡片, 验证超时�?\r\n");
-tools\rc522_app.c(198): warning:  #870-D: invalid multibyte character sequence
-      printf("检测到卡片，类�? %02X %02X\r\n", card_type[0], card_type[1]);
-tools\rc522_app.c(236): warning:  #940-D: missing return statement at end of non-void function "CardRegistrationProcess"
-  }
-tools\rc522_app.c(257): warning:  #870-D: invalid multibyte character sequence
-          printf("没有检测到卡片, 验证超时�?\r\n");
-tools\rc522_app.c(264): warning:  #870-D: invalid multibyte character sequence
-      printf("检测到卡片，类�? %02X %02X\r\n", card_type[0], card_type[1]);
-tools\rc522_app.c(277): warning:  #870-D: invalid multibyte character sequence
-          printf("验证通过，允许访�?\r\n");
-tools\rc522_app.c(289): warning:  #870-D: invalid multibyte character sequence
-          printf("验证失败，拒绝访�?\r\n");
-tools\rc522_app.c(295): warning:  #940-D: missing return statement at end of non-void function "CardVerificationProcess"
-  }
-tools\rc522_app.c(309): warning:  #870-D: invalid multibyte character sequence
-      printf("RC522 初始化完�?\r\n");
-tools\rc522_app.c(325): warning:  #1-D: last line of file ends without a newline
-  }
-tools\rc522_app.c: 12 warnings, 0 errors
+compiling ADC.c...
+system\ADC.c(89): warning:  #870-D: invalid multibyte character sequence
+      printf("adc_value = %d, adc_voltage_impedance = %0.2f （mV�?\r\n", adc_value,
+system\ADC.c(94): warning:  #870-D: invalid multibyte character sequence
+      printf("adc_value = %d, adc_voltage_light = %0.2f （mV�?\r\n", light_adc_value,
+system\ADC.c(102): warning:  #870-D: invalid multibyte character sequence
+          printf("light_adc_value = %d, adc_voltage_light = %0.2f （mV�?\r\n", light_adc_value,
+system\ADC.c: 3 warnings, 0 errors
 linking...
-Program Size: Code=17946 RO-data=694 RW-data=232 ZI-data=83736  
+Program Size: Code=19434 RO-data=870 RW-data=224 ZI-data=83664  
 FromELF: creating hex file...
 After Build - User command #1: fromelf --bin --output .\Objects\interrupt.bin .\Objects\interrupt.axf
-".\Objects\interrupt.axf" - 0 Error(s), 12 Warning(s).
+".\Objects\interrupt.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -68,22 +50,23 @@ Package Vendor: ARM
 
 Package Vendor: Keil
                 http://www.keil.com/pack/Keil.STM32F4xx_DFP.1.0.8.pack
-                Keil::Device:Startup:1.3.1
+                Keil::Device:StdPeriph Drivers:EXTI:1.3.0
                 STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
-   * Component: Startup Version: 1.3.1
    * Component: EXTI Version: 1.3.0
    * Component: Framework Version: 1.3.1
-   * Component: SPI Version: 1.3.0
-   * Component: TIM Version: 1.3.0
-   * Component: GPIO Version: 1.3.0
-   * Component: PWR Version: 1.3.0
-   * Component: SYSCFG Version: 1.3.0
+   * Component: Startup Version: 1.3.1
+   * Component: ADC Version: 1.3.0
    * Component: USART Version: 1.3.0
+   * Component: GPIO Version: 1.3.0
+   * Component: I2C Version: 1.3.0
+   * Component: SYSCFG Version: 1.3.0
    * Component: RTC Version: 1.3.0
+   * Component: PWR Version: 1.3.0
+   * Component: SPI Version: 1.3.0
    * Component: RCC Version: 1.3.0
    * Component: IWDG Version: 1.3.0
+   * Component: TIM Version: 1.3.0
    * Component: Flash Version: 1.3.0
-   * Component: I2C Version: 1.3.0
 
 <h2>Collection of Component include folders:</h2>
   e:\yueqian_projects\STM32-projects\interrupt_no_bootloader\RTE
@@ -97,67 +80,71 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:3.40.0
       Source file:   CMSIS\UserCodeTemplates\ARM\ITM_Retarget.c
 
-   * Component: Keil::Device:Startup:1.3.1
-      Include file:  RTE_Driver\Config\RTE_Device.h
-      Source file:   Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
-      Source file:   Device\Source\system_stm32f4xx.c
-      Include file:  Device\Include\stm32f4xx.h
-      Source file:   Device\Source\ARM\startup_stm32f40_41xxx.s
-      Source file:   Device\Source\ARM\STM32F4xx_OTP.s
-
    * Component: Keil::Device:StdPeriph Drivers:EXTI:1.3.0
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_exti.h
       Source file:   Device\StdPeriph_Driver\src\stm32f4xx_exti.c
 
    * Component: Keil::Device:StdPeriph Drivers:Framework:1.3.1
-      Source file:   Device\StdPeriph_Driver\templates\stm32f4xx_conf.h
-      Include file:  Device\StdPeriph_Driver\templates\stm32f4xx_it.h
       Source file:   Device\StdPeriph_Driver\templates\stm32f4xx_it.c
+      Source file:   Device\StdPeriph_Driver\templates\stm32f4xx_conf.h
       Source file:   Device\StdPeriph_Driver\src\misc.c
+      Include file:  Device\StdPeriph_Driver\templates\stm32f4xx_it.h
 
-   * Component: Keil::Device:StdPeriph Drivers:SPI:1.3.0
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_spi.c
-      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_spi.h
+   * Component: Keil::Device:Startup:1.3.1
+      Include file:  RTE_Driver\Config\RTE_Device.h
+      Source file:   Device\Source\ARM\STM32F4xx_OTP.s
+      Source file:   Device\Source\system_stm32f4xx.c
+      Include file:  Device\Include\stm32f4xx.h
+      Source file:   Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
+      Source file:   Device\Source\ARM\startup_stm32f40_41xxx.s
 
-   * Component: Keil::Device:StdPeriph Drivers:TIM:1.3.0
-      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_tim.h
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_tim.c
+   * Component: Keil::Device:StdPeriph Drivers:ADC:1.3.0
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_adc.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_adc.c
+
+   * Component: Keil::Device:StdPeriph Drivers:USART:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_usart.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_usart.h
 
    * Component: Keil::Device:StdPeriph Drivers:GPIO:1.3.0
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_gpio.c
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_gpio.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_gpio.c
 
-   * Component: Keil::Device:StdPeriph Drivers:PWR:1.3.0
-      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_pwr.h
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_pwr.c
+   * Component: Keil::Device:StdPeriph Drivers:I2C:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_i2c.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_i2c.h
 
    * Component: Keil::Device:StdPeriph Drivers:SYSCFG:1.3.0
       Source file:   Device\StdPeriph_Driver\src\stm32f4xx_syscfg.c
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_syscfg.h
 
-   * Component: Keil::Device:StdPeriph Drivers:USART:1.3.0
-      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_usart.h
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_usart.c
-
    * Component: Keil::Device:StdPeriph Drivers:RTC:1.3.0
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_rtc.h
       Source file:   Device\StdPeriph_Driver\src\stm32f4xx_rtc.c
+
+   * Component: Keil::Device:StdPeriph Drivers:PWR:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_pwr.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_pwr.h
+
+   * Component: Keil::Device:StdPeriph Drivers:SPI:1.3.0
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_spi.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_spi.c
 
    * Component: Keil::Device:StdPeriph Drivers:RCC:1.3.0
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_rcc.h
       Source file:   Device\StdPeriph_Driver\src\stm32f4xx_rcc.c
 
    * Component: Keil::Device:StdPeriph Drivers:IWDG:1.3.0
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_iwdg.c
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_iwdg.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_iwdg.c
+
+   * Component: Keil::Device:StdPeriph Drivers:TIM:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_tim.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_tim.h
 
    * Component: Keil::Device:StdPeriph Drivers:Flash:1.3.0
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_flash.c
       Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_flash.h
-
-   * Component: Keil::Device:StdPeriph Drivers:I2C:1.3.0
-      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_i2c.c
-      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_i2c.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_flash.c
 </pre>
 </body>
 </html>

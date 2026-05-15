@@ -29,6 +29,7 @@
 #include "SPI.h"
 #include "RC522.h"
 #include "rc522_app.h"
+#include "SPI_LCD.h"
 
 
 
@@ -76,7 +77,11 @@ void init(void){
     // eeprom_init();
     // I2C_Configuration();
 	// OLED_Init();
-    spi_flash_init();
+    // spi_flash_init();
+    ADC_common_init();
+    impedance_ADC_init();
+    light_sensor_ADC_init();
+
     trie_init();
 }
 
@@ -101,7 +106,9 @@ int main(){
 
             // test_spi_flash();
             // spi_flash_record_TH();
-            RC522_Main_app(1);//注册模式
+            // RC522_Main_app(1);//注册模式
+            // lcd_test();
+            adc_test();
 
             clear_key_state();//清除按键状态
         }
@@ -112,10 +119,12 @@ int main(){
             else{
                 LED2_ON;
             }
+            light_sensor_regular_light();
+            
             // IWDG_CheckResetFlag();//检查独立看门狗是否复位了CPU
             rtc_print_current_date_time();//打印当前日期和时间
             // spi_flash_record_TH_qury();
-            RC522_Main_app(0);//验证模式
+            // RC522_Main_app(0);//验证模式
             
             
             clear_key_state();//清除按键状态
