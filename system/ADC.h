@@ -5,6 +5,7 @@
 void ADC_common_init(void);
 void impedance_ADC_init(void);
 void light_sensor_ADC_init(void);
+void light_sensor_dma_init(void);
 uint16_t ADC_read(ADC_TypeDef * ADCx);
 
 void adc_test(void);

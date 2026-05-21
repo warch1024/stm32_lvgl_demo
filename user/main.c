@@ -30,6 +30,8 @@
 #include "RC522.h"
 #include "rc522_app.h"
 #include "SPI_LCD.h"
+#include "lcd_demo.h"
+#include "lcd.h"
 
 
 
@@ -37,12 +39,12 @@ void init(void){
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     // 初始化Trie树
 	led_gpio_init();
-	key_gpio_init();
-    key_interrupt_init();
+	// key_gpio_init();
+    // key_interrupt_init();
     // mq2_gpio_init();
     systick_init();
     // timer_init();
-    beep_gpio_init();
+    // beep_gpio_init();
     // timer14_pwm_init();// led1pwm
     // timer1_pwm_init();//led4pwm
     // motor1_speed_regulation_init();
@@ -67,21 +69,23 @@ void init(void){
 	// }
     // printf("MQTT connect to broker success\r\n");
     // ultra_sound_init();
-    temperature_humidity_sensor_init();
+    // temperature_humidity_sensor_init();
     // radar_init();
     // beep_pwm_init();
     // IWDG_Init(125);//初始化独立看门狗,超时时间为1秒
-    rtc_init();//初始化RTC
+    // rtc_init();//初始化RTC
     // rtc_alarm_init();
     // Flash_Init();
     // eeprom_init();
     // I2C_Configuration();
 	// OLED_Init();
     // spi_flash_init();
-    ADC_common_init();
-    impedance_ADC_init();
-    light_sensor_ADC_init();
-
+    // light_sensor_dma_init();
+    // ADC_common_init();
+    // impedance_ADC_init();
+    // light_sensor_ADC_init();
+    // CAN_init();
+    LCD_Init();
     trie_init();
 }
 
@@ -90,70 +94,71 @@ int main(){
     // SCB->VTOR = 0x8020000;//设置VTOR为Flash的基地址
 
     init();
+    lcd_demo();
     char str[] = "Hello World!\n";
     // tackle_mqtt_topic_msg_and_hearting();  // 检查MQTT主题消息并处理心跳包
     while(1){
         // radar_distance_show();
         // radar_distance_beeping();
-        if(KEY1_State == 1){
-            // oled_demo();
-            while(usart1_send_byte('X') != 1);
-            while(usart1_send_string(str) != 1);
-            printf("KEY1 Pressed\r\n");
-            // eeprom_test();
-            // uint16_t id = spi_flash_read_id();
-            // printf("spi_flash_read_id: 0x%04x\n", id);
+        // if(KEY1_State == 1){
+        //     // oled_demo();
+        //     while(usart1_send_byte('X') != 1);
+        //     while(usart1_send_string(str) != 1);
+        //     printf("KEY1 Pressed\r\n");
+        //     // eeprom_test();
+        //     // uint16_t id = spi_flash_read_id();
+        //     // printf("spi_flash_read_id: 0x%04x\n", id);
 
-            // test_spi_flash();
-            // spi_flash_record_TH();
-            // RC522_Main_app(1);//注册模式
-            // lcd_test();
-            adc_test();
+        //     // test_spi_flash();
+        //     // spi_flash_record_TH();
+        //     // RC522_Main_app(1);//注册模式
+        //     // lcd_test();
+        //     adc_test();
 
-            clear_key_state();//清除按键状态
-        }
-        if(KEY2_State == 1){
-            if(LED2_state = ~LED2_state){
-                LED2_OFF;
-            }
-            else{
-                LED2_ON;
-            }
-            light_sensor_regular_light();
+        //     clear_key_state();//清除按键状态
+        // }
+        // if(KEY2_State == 1){
+        //     if(LED2_state = ~LED2_state){
+        //         LED2_OFF;
+        //     }
+        //     else{
+        //         LED2_ON;
+        //     }
+        //     light_sensor_regular_light();
             
-            // IWDG_CheckResetFlag();//检查独立看门狗是否复位了CPU
-            rtc_print_current_date_time();//打印当前日期和时间
-            // spi_flash_record_TH_qury();
-            // RC522_Main_app(0);//验证模式
+        //     // IWDG_CheckResetFlag();//检查独立看门狗是否复位了CPU
+        //     rtc_print_current_date_time();//打印当前日期和时间
+        //     // spi_flash_record_TH_qury();
+        //     // RC522_Main_app(0);//验证模式
             
             
-            clear_key_state();//清除按键状态
-        }
-        if(KEY3_State == 1){
-            int32_t ret = temperature_humidity_sensor_measure();
-            if(ret == 0){
-                printf("temperature_humidity_sensor_measure success, temperature:%d, humidity:%d, checksum:%d\n",
-                     current_TH_data.temperature, current_TH_data.humidity, current_TH_data.checksum);
-            }
-            else{
-                printf("temperature_humidity_sensor_measure failed, ret:%d\n", ret);
-            }
-            clear_key_state();//清除按键状态
-        }
-        if(KEY4_State == 1){
-            spi_flash_force_write();
-            int8_t ret = temperature_humidity_sensor_check();
-            if(ret == 0){
-                printf("temperature_humidity_sensor_check success\n");
-            }
-            else{
-                printf("temperature_humidity_sensor_check failed\n");
-            }
+        //     clear_key_state();//清除按键状态
+        // }
+        // if(KEY3_State == 1){
+        //     int32_t ret = temperature_humidity_sensor_measure();
+        //     if(ret == 0){
+        //         printf("temperature_humidity_sensor_measure success, temperature:%d, humidity:%d, checksum:%d\n",
+        //              current_TH_data.temperature, current_TH_data.humidity, current_TH_data.checksum);
+        //     }
+        //     else{
+        //         printf("temperature_humidity_sensor_measure failed, ret:%d\n", ret);
+        //     }
+        //     clear_key_state();//清除按键状态
+        // }
+        // if(KEY4_State == 1){
+        //     spi_flash_force_write();
+        //     int8_t ret = temperature_humidity_sensor_check();
+        //     if(ret == 0){
+        //         printf("temperature_humidity_sensor_check success\n");
+        //     }
+        //     else{
+        //         printf("temperature_humidity_sensor_check failed\n");
+        //     }
 
-            clear_key_state();//清除按键状态
-        }
+        //     clear_key_state();//清除按键状态
+        // }
         //根据CO2浓度设置通风速度比例
-        run_event_task();//运行事件队列中的事件
+        // run_event_task();//运行事件队列中的事件
         // IWDG_Reload();//喂狗
     }
 }

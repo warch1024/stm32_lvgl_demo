@@ -30,6 +30,45 @@ void key_gpio_init(void)
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;//无上下拉电阻
 	GPIO_Init(GPIOE,&GPIO_InitStructure);
 }
+/*################LCD触摸显示屏的两个函数################*/
+void KEY_Init() {
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOE, ENABLE);  // HEGPIOA, GPIOEHJ++
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4;  // KEYO KEY1 KEY2X
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;  // M0MC
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;  // 100M
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;  // 上拉
+    GPIO_Init(GPIOE, &GPIO_InitStructure);  // J/A1ŁGPIOE2, 3, 4
+
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;  // WK_UPXJSIPAO
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;  // Tfo
+    GPIO_Init(GPIOA, &GPIO_InitStructure);  // JAGIŁGPIOAO
+}
+#define KEY0_IN    GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0)
+#define KEY1_IN    GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_2)
+#define KEY2_IN    GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_3)
+#define WK_UP_IN    GPIO_ReadInputDataBit(GPIOE, GPIO_Pin_4)
+
+uint8_t KEY_Scan(uint8_t mode) {
+    static u8 key_up=1;//按键按松开标志
+    //支持连按
+    if(mode) key_up = 1;
+    if(key_up&&(KEY0_IN == 0 || KEY1_IN == 0 || KEY2_IN == 0 || WK_UP_IN == 1)){
+
+        delay_ms(10);//去抖动
+        key_up=0;
+        if(KEY0_IN == 0)return 1;
+        else if(KEY1_IN == 0)return 2;
+        else if(KEY2_IN == 0)return 3;
+        else if(WK_UP_IN == 1) return 4;
+    }
+    else if(KEY0_IN == 1&&KEY1_IN == 1&&KEY2_IN == 1&&WK_UP_IN == 0) key_up=1;
+    return 0;// 无按键按下
+}
+/*################LCD触摸显示屏的两个函数################*/
+
 void key_interrupt_init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;

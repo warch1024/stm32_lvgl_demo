@@ -1,5 +1,5 @@
-Load "e:\\yueqian_projects\\STM32-projects\\interrupt_no_bootloader\\Objects\\interrupt.axf" 
-Set JLink Project File to "e:\yueqian_projects\STM32-projects\interrupt_no_bootloader\JLinkSettings.ini"* JLink Info: Device "STM32F407ZE" selected.
+Load "e:\\yueqian_projects\\STM32-projects\\LVGL\\Objects\\interrupt.axf" 
+Set JLink Project File to "e:\yueqian_projects\STM32-projects\LVGL\JLinkSettings.ini"* JLink Info: Device "STM32F407ZE" selected.
  
 JLink info:
 ------------
@@ -28,4 +28,4 @@ Watchpoints:          4
 JTAG speed: 4000 kHz
  
 Erase Done.Programming Done.Verify OK.Application running ...
-Flash Load finished at 18:53:27
+Flash Load finished at 13:39:02

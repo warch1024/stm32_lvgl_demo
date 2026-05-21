@@ -10,6 +10,7 @@
 #include "DFA_event_queue.h"
 #include "DX_BT24.h"
 #include "esp8266.h"
+#include "CAN.h"
 char uart1_cmd_cache[MAX_CMD_LEN];
 uint8_t uart1_cmd_cache_idx = 0;
 
@@ -79,12 +80,28 @@ void USART1_IRQHandler(void)    // 串口1的中断服务函数
     if(USART_GetITStatus(USART1, USART_IT_RXNE) == SET)   //判断是否是接收中断发生
     {
         // 处理接收中断
-        uint8_t recv_byte = USART_ReceiveData(USART1); // 接收字节
+        volatile uint8_t recv_byte = USART_ReceiveData(USART1); // 接收字节
         if(USE_TRIE_OPTIMIZATION){
             Trie_Match_Byte(recv_byte);
         }else{
             DFA_Match_Byte(recv_byte);// 收到字节后，将字节添加到事件队列中        
         }
+        //发送给can
+        volatile uint8_t ret;
+        ret = can1_send_message(&recv_byte, 1, 0x800);
+        if(ret == 1){
+            printf("too long\n");
+        }
+        else if(ret == 2){
+            printf("CAN no mailbox\n");
+        }
+        else if(ret == 3){
+            printf("CAN send timeout\n");
+        }
+        else{
+            printf("CAN send success\n");
+        }
+
         USART_ClearITPendingBit(USART1, USART_IT_RXNE);  // 清除接收中断标志位
     }
 }

@@ -2,7 +2,6 @@
 #define __FLASH_H__
 #include "stm32f4xx.h"
 #define SECTOR_5_BASE (0x8020000)
-
 typedef struct Sector_RW_Config_t{
     uint32_t sector_base_address;//扇区基地址
     uint32_t current_address;//当前写入地址
