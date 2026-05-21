@@ -28,4 +28,7 @@
 .\objects\lcd.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\misc.h
 .\objects\lcd.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_can.h
 .\objects\lcd.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_fsmc.h
+.\objects\lcd.o: D:\ProgramFiles\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\lcd.o: LCD\driver\font.h
+.\objects\lcd.o: .\hardware\uart.h
 .\objects\lcd.o: .\system\systick.h

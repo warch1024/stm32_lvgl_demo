@@ -1,6 +1,5 @@
 .\objects\touch.o: LCD\driver\touch.c
 .\objects\touch.o: LCD\driver\touch.h
-.\objects\touch.o: .\system\systick.h
 .\objects\touch.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\Include\stm32f4xx.h
 .\objects\touch.o: D:\ProgramFiles\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm4.h
 .\objects\touch.o: D:\ProgramFiles\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
@@ -30,7 +29,7 @@
 .\objects\touch.o: D:\ProgramFiles\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc\stm32f4xx_fsmc.h
 .\objects\touch.o: LCD\driver\lcd.h
 .\objects\touch.o: D:\ProgramFiles\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\touch.o: .\system\systick.h
 .\objects\touch.o: D:\ProgramFiles\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\objects\touch.o: LCD\driver\24cxx.h
 .\objects\touch.o: LCD\driver\myiic.h
-.\objects\touch.o: .\LCD\app\gui.h
